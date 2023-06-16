@@ -1,5 +1,5 @@
-I1 = im2gray(imread("Prosjekt/DSC_0675.JPG"));
-I2 = im2gray(imread("Prosjekt/DSC_0676.JPG"));
+I1 = im2gray(imread('delivery_area_dslr_undistorted\delivery_area\images\dslr_images_undistorted\DSC_0680.JPG'));
+I2 = im2gray(imread("delivery_area_dslr_undistorted\delivery_area\images\dslr_images_undistorted\DSC_0681.JPG"));
 
 points1 = detectHarrisFeatures(I1);
 points2 = detectHarrisFeatures(I2);
