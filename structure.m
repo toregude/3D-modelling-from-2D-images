@@ -1,5 +1,5 @@
 % Specify the path to the subfolder containing the images
-subfolderPath = 'C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\delivery_area_dslr_undistorted\delivery_area\images\dslr_images_undistorted\';
+subfolderPath = '.\delivery_area_dslr_undistorted\delivery_area\images\dslr_images_undistorted\';
 
 % Get a list of all files and folders in the subfolder
 files = dir(fullfile(subfolderPath, '*.JPG'));  % Modify the file extension as needed
