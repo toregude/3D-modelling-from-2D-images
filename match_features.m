@@ -1,6 +1,11 @@
+clear;
+clc;
+
 I1 = im2gray(imread("DSC_0682.JPG"));
 cameraParams = cameraParameters;
 I2 = im2gray(imread("DSC_0684.JPG"));
+
+K = [3408.59 0 3117.24; 0 3408.87 2064.07; 0 0 1];
 
 points1 = detectHarrisFeatures(I1);
 points2 = detectHarrisFeatures(I2);
@@ -22,11 +27,11 @@ matchedPoints1_inliers = matchedPoints1(inliers==1);
 matchedPoints2_inliers = matchedPoints2(inliers==1);
 correspondences = [matchedPoints1_inliers.Location, matchedPoints2_inliers.Location];
 figure; 
-%showMatchedFeatures(I1,I2,matchedPoints1_inliers,matchedPoints2_inliers);
+showMatchedFeatures(I1,I2,matchedPoints1_inliers,matchedPoints2_inliers);
 correspondences'
 
 [T1, T2, R1, R2, U, V] = TR_from_E(E);
-[T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, correspondences')
+[T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, correspondences', K)
 
 %%  Functions
 
@@ -43,8 +48,44 @@ function [T1, T2, R1, R2, U, V] = TR_from_E(E)
     R1 = U*[0 1 0; -1 0 0; 0 0 1]*V';
     R2 = U*[0 -1 0; 1 0 0; 0 0 1]*V';
 end
+% function [T1,R1,T2,R2, U, V]=TR_from_E(E)
+% 
+% % Stelle sicher, dass U und V Rotationsmatrizen sind
+% [U,S,V]=svd(E);
+% 
+% if det(U) < 0
+% 	U = U*diag([1 1 -1]);
+% end
+% 
+% if det(V) < 0
+% 	V = V*diag([1 1 -1]);
+% end
+% 
+% % Der Vektor T liegt im Nullraum von E', ebenso liegt U(:,3) im Nullraum
+% % von E'. Da die Translation nur bis auf Skalierung geschätzt werden kann,
+% % können wir diesen Vektor für T verwenden.
+% % T1=U(:,3); 
+% 
+% % T2 zeigt in die entgegengesetzte Richtung
+% % T2=-T1;
+% 
+% RZp=[0 -1 0; 1 0 0;0 0 1];
+% RZm=[0  1 0;-1 0 0;0 0 1];
+% 
+% R1=U*RZp'*V';
+% R2=U*RZm'*V';
+% 
+% % Alternativ laesst sich T ueber die Formel aus dem Skript berechnen
+% T1_hat = U*RZp*S*U';
+% T1 = [T1_hat(3,2);T1_hat(1,3);T1_hat(2,1);];
+% T2_hat = U*RZm*S*U';
+% T2 = [T2_hat(3,2);T2_hat(1,3);T2_hat(2,1)];
+% 
+% end
 
-function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, correspondences)
+
+
+function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, correspondences, K)
     % Preparation
     N = length(correspondences(1, :));
     T_cell = {T1, T2, T1, T2};
@@ -53,6 +94,12 @@ function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, corre
     x2 = correspondences(3:4, :);
     x1(3, :) = 1;
     x2(3, :) = 1;
+    for i = 1:N
+        Kx1 = K^-1*x1(:, i);
+        Kx2 = K^-1*x2(:, i);
+        x1(:, i) = Kx1;
+        x2(:, i) = Kx2;
+    end
     d = zeros(N, 2);
     d_cell = {d, d, d, d};
 
@@ -63,7 +110,7 @@ function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, corre
     M2 = zeros(3*N, N + 1);
     maxSum = 0;
     maxIdx = 1;
-    for i = 1:4
+    for i = 1:n
         T = T_cell{i};
         R = R_cell{i};
         for j = 1:N
@@ -82,13 +129,12 @@ function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, corre
         d2 = d2 / d2(end);
         d_tot = [d1, d2];
         d_cell{i} = d_tot(1:end-1, :);
-        max = sum(sign(d_cell{i}))
-        if max(1) > maxSum;
+        max = sum(sign(d_cell{i}));
+        if max(1) > maxSum
             maxSum = max;
             maxIdx = i;
         end
     end
-    maxIdx = 4;
     R = R_cell{maxIdx};
     T = T_cell{maxIdx};
     lambda = d_cell{maxIdx};
@@ -99,6 +145,7 @@ function [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, corre
     for i = 1:size(x1, 2)
         P1(:, i) = x1(:, i)*lambda(i);
     end
+    figure;
     scatter3(P1(1, :), P1(2, :), P1(3, :));
     camC1 = [-0.2 0.2 0.2 -0.2; 0.2 0.2 -0.2 -0.2; 1 1 1 1];
     camC2 = zeros(3, 4);
