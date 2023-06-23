@@ -1,5 +1,4 @@
-clear;
-clc;
+
 
 I1 = im2gray(imread("DSC_0682.JPG"));
 cameraParams = cameraParameters;
