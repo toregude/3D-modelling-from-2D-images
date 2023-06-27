@@ -1,0 +1,6 @@
+Dokumentasjon for ETH3D:
+https://www.eth3d.net/documentation#format-of-multi-view-data-cameras-txt
+
+Jukselapp for terminalbruk av Github:
+https://gist.github.com/cferdinandi/ef665330286fd5d7127d
+
