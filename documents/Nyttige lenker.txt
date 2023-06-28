@@ -4,3 +4,23 @@ https://www.eth3d.net/documentation#format-of-multi-view-data-cameras-txt
 Jukselapp for terminalbruk av Github:
 https://gist.github.com/cferdinandi/ef665330286fd5d7127d
 
+Colmap Github:
+https://github.com/colmap/colmap
+
+Colmap documentation:
+https://colmap.github.io/index.html
+
+Computer vision toolbox:
+https://se.mathworks.com/products/computer-vision.html
+
+Computer vision toolbox functions:
+https://se.mathworks.com/help/vision/referencelist.html?type=function
+
+Computer vision toolbox examples:
+https://se.mathworks.com/help/vision/examples.html
+
+Example how to estimate 3D structure of a scene from a set of 2D images:
+https://se.mathworks.com/help/vision/ug/structure-from-motion-from-two-views.html
+
+Example combine multiple point clouds to reconstruct 3D scene using ICP algorithm:
+https://se.mathworks.com/help/vision/ug/3-d-point-cloud-registration-and-stitching.html
