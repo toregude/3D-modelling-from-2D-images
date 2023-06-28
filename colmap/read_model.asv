@@ -42,7 +42,7 @@ images = read_images([path 'images.txt']);
 points3D = read_points3D([path 'points3D.txt']);
 
 end
-
+function fid = aapnedendritten()
 
 function cameras = read_cameras(path)
 
