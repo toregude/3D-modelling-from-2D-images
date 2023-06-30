@@ -1,4 +1,4 @@
-ID X Y Z (camera pos) Kamera Bildname
+# ID X Y Z (camera pos) Kamera Bildname
 31 -0.53452 -1.87754 -0.37086 0 dslr_images_undistorted/DSC_6520.JPG 
 30 -0.49147 -1.24445 -0.3691 0 dslr_images_undistorted/DSC_6519.JPG 
 29 0.0673 -0.6366 -0.36641 0 dslr_images_undistorted/DSC_6518.JPG 
