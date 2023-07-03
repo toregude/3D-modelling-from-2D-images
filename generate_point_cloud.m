@@ -93,16 +93,37 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     showMatchedFeatures(I1, I2, inlierPoints1, inlierPoints2);
     title('Epipolar Inliers');
 
+    correspondences = [inlierPoints1'; inlierPoints2'];
+
+    [T1, T2, R1, R2] = TR_from_E(E);
+    [T, R, lambda, P] = reconstruction(T1, T2, R1, R2, C1, C2, correspondences, K); %DENNE HER ER MYE VERRE EN GUSTAV SIN! HVORFOR?
+    % [T,R, lambda, P1] = rekonstruktion(T1,T2,R1,R2,C1, correspondences, K); %DENNE ER GUSTAV SIN
+
+    T_exact = C2-C1;
+
+    "How does the exact T compare to the computed T???"
+    T-T_exact
+    T1 - T_exact
+    T2 - T_exact
+    
+    %BRUK RELPOSE!! 
     %calculates the pose of a calibrated camera relative to its previous pose
     relPose = estrelpose(E, intrinsics, inlierPoints1, inlierPoints2);
 
     "Calculated translation:"
-    T = relPose.Translation
+    T_estrel = relPose.Translation
 
-    "Real translation"
-    C2-C1
+    "Forskjell translasjon"
+    norm(T+T_estrel')
 
-    % % Detect dense feature points. Use an ROI to exclude points close to the image edges.
+    "Forskjell rotasjon"
+    norm(R-relPose.Rotation,"fro")
+
+    % 
+    % "Real translation"
+    % C2-C1
+    % 
+    % % % Detect dense feature points. Use an ROI to exclude points close to the image edges.
     % border = 30;
     % roi = [border, border, size(I1, 2)- 2*border, size(I1, 1)- 2*border];
     % imagePoints1 = detectHarrisFeatures(im2gray(I1), ROI = roi, MinQuality = 0.001);
