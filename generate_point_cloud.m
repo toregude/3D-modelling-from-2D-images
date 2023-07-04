@@ -19,6 +19,9 @@ for i = 1:numel(files)
     imageFiles{i} = fullfile(subfolderPath, files(i).name);
 end
 
+%DEBUGGING TRANS AND ROT DATA
+[debug_data] = debugging_translation_rotation();
+
 %Calibration matrix for the kicker
 K_path = '.\test_data_kicker\parameters\';
 [K] = K_from_cameraparams(K_path);
@@ -114,6 +117,18 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     % "Check 2"
     % "Calculated translation:"
     % T_estrel = relPose.Translation;
+    % R_estrel = relPose.Rotation;
+
+    T_debug = debug_data(i,5:7);
+    R_debug = quat2rotm(debug_data(i,1:4));
+
+    "Forskjell i T:"
+    T' - T_debug
+
+    "Forskjell i R:"
+    R' - R_debug
+
+    break;
 
     % "Forskjell translasjon"
     % norm(T+T_estrel')
