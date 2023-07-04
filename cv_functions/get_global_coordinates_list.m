@@ -1,12 +1,15 @@
 
-path = '.\kicker_dslr_undistorted (ONLY FOR DEBUGGING)\kicker\dslr_calibration_undistorted\points3D.txt';
+clc;
+clear;
+
+path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
 
 global_coordinates = get_global_coordinates_list_test(path);
 
 %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
 
 % Create a sample point cloud data in a list format
-point_cloud_data = global_coordinates;
+data = global_coordinates;
 % [
 %     1.2, 3.4, 2.1;
 %     2.3, 1.5, 4.2;
@@ -16,90 +19,106 @@ point_cloud_data = global_coordinates;
 % ];
 
 
+[idx, corepoints] = dbscan(data, 0.2, 20);
+numObjects = length(unique(idx)) - 1;
 
-% Parameters
-maxClusters = 50; % Maximum number of clusters to consider
-maxIterations = 200; % Maximum number of iterations for k-means
-distances = zeros(maxClusters, 1);
-
-% Calculate the sum of squared distances for different number of clusters
-for k = 1:maxClusters
-    centroids = initializeCentroids(point_cloud_data, k);
-    [~, sumd] = runKMeans(point_cloud_data, centroids, maxIterations);
-    distances(k) = sum(sumd);
+min_list = zeros(3,numObjects)';
+max_list = zeros(3,numObjects)';
+for i = 1:numObjects
+    points_i = data(idx==i, :);
+    max_list(i, :) = max(points_i);
+    min_list(i, :) = min(points_i);
 end
 
-% Plot the elbow curve
-figure;
-plot(1:maxClusters, distances, 'o-');
-title('Elbow Curve');
-xlabel('Number of Clusters');
-ylabel('Sum of Squared Distances');
-
-% Prompt the user to select the optimal number of clusters
-numClusters = input('Select the optimal number of clusters: ');
-
-% Perform clustering using k-means algorithm
-centroids = initializeCentroids(point_cloud_data, numClusters);
-[idx, ~] = runKMeans(point_cloud_data, centroids, maxIterations);
-
-% Plot the results
-figure;
-scatter3(point_cloud_data(:,1), point_cloud_data(:,2), point_cloud_data(:,3), 36, idx, 'filled');
-title('Point Cloud Clustering');
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-grid on;
-
-function centroids = initializeCentroids(data, k)
-    numPoints = size(data, 1);
-    randIndices = randperm(numPoints, k);
-    centroids = data(randIndices, :);
+senterliste = zeros(numObjects, 3);
+lengdeliste = zeros(numObjects, 3);
+for i = 1:numObjects
+    O = (min_list(i, :) + max_list(i, :))/2;
+    lenX = max_list(i, 1) - min_list(i, 1);
+    lenY = max_list(i, 2) - min_list(i, 2);
+    lenZ = max_list(i, 3) - min_list(i, 3);
+    lengder = [lenX, lenY, lenZ];
+    senterliste(i, :) = O;
+    lengdeliste(i ,:) = lengder;
 end
 
-function [idx, sumd] = runKMeans(data, centroids, maxIterations)
-    numClusters = size(centroids, 1);
-    numPoints = size(data, 1);
-    idx = zeros(numPoints, 1);
-    sumd = zeros(numClusters, 1);
-    
-    for iter = 1:maxIterations
-        % Assign points to the nearest cluster
-        distances = calculateDistances(data, centroids);
-        [~, newIdx] = min(distances, [], 2);
-        
-        % Update cluster centroids
-        for k = 1:numClusters
-            clusterPoints = data(newIdx == k, :);
-            centroids(k, :) = mean(clusterPoints);
-        end
-        
-        if isequal(idx, newIdx)
-            break;
-        end
-        
-        idx = newIdx;
-    end
-    
-    % Calculate the sum of squared distances
-    for k = 1:numClusters
-        clusterPoints = data(idx == k, :);
-        sumd(k) = sum(sum((clusterPoints - centroids(k, :)).^2, 2));
-    end
+figure
+hold on;
+for i = 1:numObjects
+    drawBox(senterliste(i,:), lengdeliste(i,:));
 end
 
-function distances = calculateDistances(data, centroids)
-    numPoints = size(data, 1);
-    numClusters = size(centroids, 1);
-    distances = zeros(numPoints, numClusters);
-    
-    for k = 1:numClusters
-        centroid = centroids(k, :);
-        differences = bsxfun(@minus, data, centroid);
-        distances(:, k) = sqrt(sum(differences.^2, 2));
-    end
-end
+
+
+
+% % for i = 1:size(data, 1)
+% %     if (idx(i) == -1)
+% %         plot3(data(i, 1), data(i, 2), data(i, 3), 'r+', 'MarkerSize', 10);
+% %         hold on;
+% %     else
+% %         if (corepoints(i) == 1)
+% %             plot3(data(i, 1), data(i, 2), data(i, 3), 'b.', 'MarkerSize', 10);
+% %         else
+% %             plot3(data(i, 1), data(i, 2), data(i, 3), 'g*', 'MarkerSize', 10);
+% %         end
+% %         hold on;
+% %     end
+% % 
+% %     if mod(i, 1000) == 0
+% %         i
+% %     end
+% % end
+hold off;
+
+
+
+% % % % % % % Set the maximum desired distance between points within clusters
+% % % % % % maxDistance = 2.0;
+% % % % % % 
+% % % % % % % Calculate the pairwise distances between points using vectorization
+% % % % % % numPoints = size(point_cloud_data, 1);
+% % % % % % distances = sqrt(sum((reshape(point_cloud_data, [1, numPoints, 3]) - reshape(point_cloud_data, [numPoints, 1, 3])).^2, 3));
+% % % % % % 
+% % % % % % % Perform agglomerative hierarchical clustering
+% % % % % % clusters = 1:numPoints;
+% % % % % % clusterCount = numPoints
+% % % % % % a = 0;
+% % % % % % 
+% % % % % % while clusterCount > 1
+% % % % % %     [minDistance, minIndex] = min(distances(:));
+% % % % % %     [row, col] = ind2sub([numPoints, numPoints], minIndex);
+% % % % % % 
+% % % % % %     if minDistance > maxDistance
+% % % % % %         break;
+% % % % % %     end
+% % % % % % 
+% % % % % %     clusters(clusters == clusters(col)) = clusters(row);
+% % % % % %     clusterCount = clusterCount - 1;
+% % % % % % 
+% % % % % %     distances([row, col], :) = maxDistance + 1; % Set distances to a large value
+% % % % % %     distances(:, [row, col]) = maxDistance + 1;
+% % % % % % 
+% % % % % %     for j = 1:numPoints
+% % % % % %         if clusters(j) == clusters(row)
+% % % % % %             distances(row, j) = min(distances(row, j), distances(col, j));
+% % % % % %             distances(j, row) = distances(row, j);
+% % % % % %         end
+% % % % % %     end
+% % % % % %     a = a + 1;
+% % % % % %     if mod(a, 100) == 0
+% % % % % %         a
+% % % % % %     end
+% % % % % % end
+% % % % % % 
+% % % % % % % Plot the results
+% % % % % % figure;
+% % % % % % scatter3(point_cloud_data(:,1), point_cloud_data(:,2), point_cloud_data(:,3), 36, clusters, 'filled');
+% % % % % % title('Point Cloud Clustering');
+% % % % % % xlabel('X');
+% % % % % % ylabel('Y');
+% % % % % % zlabel('Z');
+% % % % % % grid on;
+
 
 
 function global_coordinates = get_global_coordinates_list_test(path)
@@ -152,4 +171,48 @@ function no_lines = count_lines(path)
     fclose(fid);
 
     no_lines = lastElementLine;
+end
+
+
+function drawBox(origin, sideLengths)
+    % Extract coordinates of the origin
+    x = origin(1);
+    y = origin(2);
+    z = origin(3);
+    
+    % Extract side lengths
+    sideLengthX = sideLengths(1);
+    sideLengthY = sideLengths(2);
+    sideLengthZ = sideLengths(3);
+    
+    % Define the vertices of the box
+    vertices = [
+        x, y, z;                        % Vertex 1
+        x + sideLengthX, y, z;          % Vertex 2
+        x + sideLengthX, y + sideLengthY, z;  % Vertex 3
+        x, y + sideLengthY, z;          % Vertex 4
+        x, y, z + sideLengthZ;          % Vertex 5
+        x + sideLengthX, y, z + sideLengthZ;  % Vertex 6
+        x + sideLengthX, y + sideLengthY, z + sideLengthZ;  % Vertex 7
+        x, y + sideLengthY, z + sideLengthZ   % Vertex 8
+    ];
+
+    % Define the faces of the box
+    faces = [
+        1, 2, 3, 4;    % Bottom face
+        5, 6, 7, 8;    % Top face
+        1, 2, 6, 5;    % Side face
+        2, 3, 7, 6;    % Side face
+        3, 4, 8, 7;    % Side face
+        4, 1, 5, 8     % Side face
+    ];
+
+    % Plot the box
+    patch('Vertices', vertices, 'Faces', faces, 'FaceColor', 'blue', 'FaceAlpha', 0.5);
+    axis equal;
+    grid on;
+    xlabel('X');
+    ylabel('Y');
+    zlabel('Z');
+    title('Box');
 end
