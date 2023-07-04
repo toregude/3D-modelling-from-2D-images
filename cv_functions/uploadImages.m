@@ -17,7 +17,13 @@ disp('Button clicked! Continuing with further code execution.');
 
 X = load('imageData.mat');
 images = X.imageDataArray;
-% 
+
+%[origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes();
+%app.origin = origin;
+%app.sideLength = sideLength;
+%app.X_floor = X_floor;
+%app.Y_floor = Y_floor;
+%app.Z_floor = Z_floor;
 % % Display a dialog box to choose multiple image files
 % [fileNames, path] = uigetfile({'*.jpg;*.jpeg;*.png;*.bmp'}, 'Select image files', 'MultiSelect', 'on');
 % if isequal(fileNames, 0)
