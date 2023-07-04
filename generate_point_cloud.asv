@@ -37,7 +37,12 @@ cam_pos_unsorted = allData(:, 1:4);
 
 all_points_3D = [];
 all_color = [];
-for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1    
+for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
+    %Get the grayscale images i and i+1.
+    %The code here is really how we should do it! But do we need to sort the pictures first? After similarity?
+    % I1 = im2gray(imread(imageFiles{i}));
+    % I2 = im2gray(imread(imageFiles{i+1}));
+    
     %THE IMAGES ARE NATURALLY SORTED IN THE SAME WAY AS 
     I1 = imread(imageFiles{i});
     I2 = imread(imageFiles{i+1});
@@ -58,8 +63,8 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
     
     %Undistort the pictures
-    % I1 = undistortImage(I1, intrinsics);
-    % I2 = undistortImage(I2, intrinsics);
+    I1 = undistortImage(I1, intrinsics);
+    I2 = undistortImage(I2, intrinsics);
 
     harrisFeatures1 = detectHarrisFeatures(im2gray(I1));
     harrisFeatures2 = detectHarrisFeatures(im2gray(I2));
@@ -194,18 +199,18 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     "Iterasjon nummer"
     i
 
-    if i >= 10
-        break;
-    end
+    % if i >= 5
+    %     break;
+    % end
 end
 
 figure
-scatter3(all_points_3D(:,1),all_points_3D(:,2),all_points_3D(:,3))
+% scatter3(all_points_3D(:,1),all_points_3D(:,2),all_points_3D(:,3))
 
 % Create the point cloud
 % ptCloud = pointCloud(points3D, 'Color', color);
-% "Lage pointcloud"
-% ptCloud = pointCloud(all_points_3D, 'Color', all_color);
+"Lage pointcloud"
+ptCloud = pointCloud(all_points_3D, 'Color', all_color);
 
 % Visualize the camera locations and orientations
 % cameraSize = 0.3;
@@ -218,8 +223,8 @@ scatter3(all_points_3D(:,1),all_points_3D(:,2),all_points_3D(:,3))
 
 
 % Visualize the point cloud
-% "Visualisere pointcloud"
-% pcshow(ptCloud, VerticalAxis='y', VerticalAxisDir='down', MarkerSize=45);
+"Visualisere pointcloud"
+pcshow(ptCloud, VerticalAxis='y', VerticalAxisDir='down', MarkerSize=45);
 % 
 % % Rotate and zoom the plot
 % % camorbit(0, -30);

@@ -12,7 +12,7 @@
 
 
 function [K] = K_from_cameraparams(path)
-
+    path = fullfile(path, '\cameras.txt');
     fid = fopen(path);
     tline = fgets(fid);
     while ischar(tline)

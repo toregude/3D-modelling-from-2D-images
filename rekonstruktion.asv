@@ -12,11 +12,11 @@ x1_pixel_array = [Korrespondenzen(1:2,:); ones(1, N)];
 x2_pixel_array = [Korrespondenzen(3:4,:); ones(1, N)];
 
 % Kalibrierung der Pixelkoordinaten um Bildkoordinaten zu erhalten
-x1_array = K \ x1_pixel_array;
-x2_array = K \ x2_pixel_array;
+% x1_array = K \ x1_pixel_array;
+% x2_array = K \ x2_pixel_array;
 
-% x1_array = x1_pixel_array;
-% x2_array = x2_pixel_array;
+x1_array = x1_pixel_array;
+x2_array = x2_pixel_array;
 
 % 4 mögliche Kombinationen aus T_1,2 und R_1,2, d.h. wir muessen 4 mal das
 % Gleichungssystem M1 aufstellen, um die Tiefeninformation lambda fuer die
@@ -61,10 +61,10 @@ T       = T_all(:,index);
 R       = R_all(:,:,index);
 
 % Zeige euklidische Transformation
-% fprintf('Rotations-Matrix:\n');
-% fprintf('%+5.3f %+5.3f %+5.3f\n',R');
-% fprintf('\nTranslations-Vektor:\n');
-% fprintf('%+4.2f\n',T);
+fprintf('Rotations-Matrix:\n');
+fprintf('%+5.3f %+5.3f %+5.3f\n',R');
+fprintf('\nTranslations-Vektor:\n');
+fprintf('%+4.2f\n',T);
 
 lambda  = lambdas(:, :, index);
 
@@ -76,9 +76,7 @@ lambda1 = lambda(:,1);
 % Berechne die Weltkoordinaten der Bildpunkte aus Bild 1 in Kamera 1
 P = bsxfun(@times, lambda1', x1_array);
 n = length(P);
-for i = 1:n
-    P(:,i) = P(:,i) + C1';
-end
+
 
 % Darstellung der 3D-Rekonstruktion samt Kamera-Perspektiven
 % figure('name', 'Rekonstruierte 3D-Punkte');
