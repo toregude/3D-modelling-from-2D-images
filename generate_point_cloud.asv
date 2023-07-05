@@ -141,22 +141,22 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     % "Real translation"
     % C2-C1
     % 
-    % % Detect dense feature points. Use an ROI to exclude points close to the image edges.
-    border = 30;
-    roi = [border, border, size(I1, 2)- 2*border, size(I1, 1)- 2*border];
-    imagePoints1 = detectHarrisFeatures(im2gray(I1), ROI = roi, MinQuality = 0.001);
-
-    % Create the point tracker
-    tracker = vision.PointTracker();
-
-    % Initialize the point tracker
-    imagePoints1 = imagePoints1.Location;
-    initialize(tracker, imagePoints1, I1);
-
-    % Track the points
-    [imagePoints2, validIdx] = step(tracker, I2);
-    matchedPoints1 = imagePoints1(validIdx, :);
-    matchedPoints2 = imagePoints2(validIdx, :);
+    % % % Detect dense feature points. Use an ROI to exclude points close to the image edges.
+    % border = 30;
+    % roi = [border, border, size(I1, 2)- 2*border, size(I1, 1)- 2*border];
+    % imagePoints1 = detectHarrisFeatures(im2gray(I1), ROI = roi, MinQuality = 0.01);
+    % 
+    % % Create the point tracker
+    % tracker = vision.PointTracker();
+    % 
+    % % Initialize the point tracker
+    % imagePoints1 = imagePoints1.Location;
+    % initialize(tracker, imagePoints1, I1);
+    % 
+    % % Track the points
+    % [imagePoints2, validIdx] = step(tracker, I2);
+    % matchedPoints1 = imagePoints1(validIdx, :);
+    % matchedPoints2 = imagePoints2(validIdx, :);
     
     % "Check 3"
 
@@ -169,17 +169,15 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
 
     % 
     % % Compute the 3-D points
-    points_triang = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2)';
-    % points_triang = triangulate(inlierPoints1, inlierPoints2, camMatrix1, camMatrix2)';
-    points_triang_hom = [points_triang; ones(1,size(points_triang,2))];
+    % % points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2);
+    points_triang = triangulate(inlierPoints1, inlierPoints2, camMatrix1, camMatrix2);
+    points_triang_hom = [points_triang ones(size(points_triang,1),1)]';
 
-    M = [R_estrel -R_estrel*C1'; zeros(1,3) 1];
-    
-    points_world_hom = zeros(size(points_triang_hom));
-    points_world = zeros(size(points_triang));
-    for k = 1:(size(points_triang_hom,2))
-        points_world_hom(:,k) = M*points_triang_hom(:,k);
-        points_world(:,k) = [points_world_hom(1,k)/points_world_hom(4,k) points_world_hom(2,k)/points_world_hom(4,k) points_world_hom(3,k)/points_world_hom(4,k)]';
+    M = [R_estrel -R_estrel*C1; zeros(1,4) 1];
+   
+    points_world = zeros(size(points_triang_hom));
+    for i = 1:(size(points_triang_hom,2))
+        
     end
     
     % "Forskjell mellom points gustav og triang!!"
@@ -188,19 +186,35 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
 
     % break;
     % all_points_3D = [all_points_3D; points3D];
-    all_points_3D = [all_points_3D points_world];
+    all_points_3D = [all_points_3D; points_Gustav];
 
+    %GJØR ALT FREM TIL HER FOR ALLE BILDEPAR! HVOR DU SLÅR SAMMEN ALLE POINTS3D, OG DERETTER LAGER PUNKTSKYOBJECT.
+
+    % scatter3(points3D(:,1),points3D(:,2),points3D(:,3));
 
     % % Get the color of each reconstructed point
+    % %THIS IS BAD CODE! THIS IS REDUNDANT, AND SHOULD BE DONE IN ANOTHER WAY.
+    % I1 = imread('.\test_data_kicker\images\DSC_6489.JPG');
+    % I2 = imread('.\test_data_kicker\images\DSC_6502.JPG');
+    % % I1 = imread(imageFiles{i});
+    % % I2 = imread(imageFiles{i+1});
     % 
-    numPixels = size(I1, 1) * size(I1, 2);
-    allColors = reshape(I1, [numPixels, 3]);
-    colorIdx = sub2ind([size(I1, 1), size(I1, 2)], round(matchedPoints1(:,2)), ...
-        round(matchedPoints1(:, 1)));
-    color = allColors(colorIdx, :);
+    % numPixels = size(I1, 1) * size(I1, 2);
+    % allColors = reshape(I1, [numPixels, 3]);
+    % colorIdx = sub2ind([size(I1, 1), size(I1, 2)], round(matchedPoints1(:,2)), ...
+    %     round(matchedPoints1(:, 1)));
+    % color = allColors(colorIdx, :);
+    % 
+    % all_color = [all_color; color];
 
-    all_color = [all_color; color];
-
+    % numPixels = size(I1, 1) * size(I1, 2);
+    % allColors = reshape(I1, [numPixels, 3]);
+    % colorIdx = sub2ind([size(I1, 1), size(I1, 2)], round(inlierPoints1(:,2)), ...
+    %     round(inlierPoints1(:, 1)));
+    % color = allColors(colorIdx, :);
+    % 
+    % all_color = [all_color; color];
+    % 
     
     % 
     % % %Add a break just for debugging so that the loop does not go too far    
@@ -213,17 +227,13 @@ for i = 1:size(imageFiles,1)-1 %-1 since we iterate over both i and i+1
     end
 end
 
-%DUE TO SLOPPINES OF DIMENSION CONSISTENCY
-all_points_3D = all_points_3D';
-
 figure
-% all_points_3D = all_points_3D';
-% scatter3(all_points_3D(:,1),all_points_3D(:,2),all_points_3D(:,3))
+scatter3(all_points_3D(:,1),all_points_3D(:,2),all_points_3D(:,3))
 
 % Create the point cloud
 % ptCloud = pointCloud(points3D, 'Color', color);
 % "Lage pointcloud"
-ptCloud = pointCloud(all_points_3D, 'Color', all_color);
+% ptCloud = pointCloud(all_points_3D, 'Color', all_color);
 
 % Visualize the camera locations and orientations
 % cameraSize = 0.3;
@@ -237,7 +247,7 @@ ptCloud = pointCloud(all_points_3D, 'Color', all_color);
 
 % Visualize the point cloud
 % "Visualisere pointcloud"
-pcshow(ptCloud, VerticalAxis='y', VerticalAxisDir='down', MarkerSize=45);
+% pcshow(ptCloud, VerticalAxis='y', VerticalAxisDir='down', MarkerSize=45);
 % 
 % % Rotate and zoom the plot
 % % camorbit(0, -30);
