@@ -1,4 +1,4 @@
-function [T,R, lambda, P] = rekonstruktion(T1,T2,R1,R2, C1, Korrespondenzen, K)
+function [T,R, lambda, P1] = rekonstruktion(T1,T2,R1,R2, C1, Korrespondenzen, K)
 
 %% Finden der korrekten Euklidischen Bewegung über die Positive-Tiefen-Bedingung
 
@@ -12,11 +12,11 @@ x1_pixel_array = [Korrespondenzen(1:2,:); ones(1, N)];
 x2_pixel_array = [Korrespondenzen(3:4,:); ones(1, N)];
 
 % Kalibrierung der Pixelkoordinaten um Bildkoordinaten zu erhalten
-x1_array = K \ x1_pixel_array;
-x2_array = K \ x2_pixel_array;
+% x1_array = K \ x1_pixel_array;
+% x2_array = K \ x2_pixel_array;
 
-% x1_array = x1_pixel_array;
-% x2_array = x2_pixel_array;
+x1_array = x1_pixel_array;
+x2_array = x2_pixel_array;
 
 % 4 mögliche Kombinationen aus T_1,2 und R_1,2, d.h. wir muessen 4 mal das
 % Gleichungssystem M1 aufstellen, um die Tiefeninformation lambda fuer die
@@ -74,10 +74,10 @@ lambda1 = lambda(:,1);
 %% Berechnung und Darstellung der 3D-Punkte und der Kameras
 
 % Berechne die Weltkoordinaten der Bildpunkte aus Bild 1 in Kamera 1
-P = bsxfun(@times, lambda1', x1_array);
-n = length(P);
+P1 = bsxfun(@times, lambda1', x1_array);
+n = length(P1);
 for i = 1:n
-    P(:,i) = P(:,i) + C1';
+    P1(:,i) = P1(:,i) + C1';
 end
 
 % Darstellung der 3D-Rekonstruktion samt Kamera-Perspektiven
