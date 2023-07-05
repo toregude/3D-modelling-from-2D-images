@@ -67,8 +67,12 @@ disp(sequence);
 imageFiles = imageFiles(sequence);
 cam_pos_sorted = cam_pos_sorted(sequence);
 
+Es = cell(1,size(imageFiles,1)-1);
+inlierPoints1 = cell(1,size(imageFiles,1)-1);
+inlierPoints2 = cell(1,size(imageFiles,1)-1);
 for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
-    [E, epipolarInliers] = estimateEssentialMatrix(matches{sequence(i),sequence(i+1)}, matches{sequence(i+1),sequence(i)}, intrinsics, Confidence = 80);
-    inlierPoints1 = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
-    inlierPoints2 = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
+    [E, epipolarInliers] = estimateEssentialMatrix(matches{sequence(i),sequence(i+1)}, matches{sequence(i+1),sequence(i)}, intrinsics, Confidence = 0.99);
+    Es{i} = E;
+    inlierPoints1{i} = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
+    inlierPoints2{i} = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
 end
