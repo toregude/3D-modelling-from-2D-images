@@ -29,32 +29,46 @@ imageSize = size(image);
 focalLength = [K(1,1) K(2,2)];
 principalPoint = [K(1,3) K(2,3)];
 intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
-for i = 1: size(imageFiles,1)-1 
+
+features = cell(1,size(imageFiles,1));
+valid = cell(1,size(imageFiles,1));
+
+%%
+for i = 1:size(imageFiles,1)
     I1 = im2gray(imread(imageFiles{i}));
-    I2 = im2gray(imread(imageFiles{i+1}));
-
-    C1 = cam_pos_sorted(i,2:4);
-    C2 = cam_pos_sorted(i+1,2:4);
-
     harrisFeatures1 = detectHarrisFeatures(I1);
-    harrisFeatures2 = detectHarrisFeatures(I2);
     [features1,validCorners1] = extractFeatures(I1,harrisFeatures1);
-    [features2,validCorners2] = extractFeatures(I2,harrisFeatures2);
-    
-    [indexPairs,matchMetric] = matchFeatures(features1,features2);
-
-    matchedPoints1 = validCorners1.Location(indexPairs(:,1),:);
-    matchedPoints2 = validCorners2.Location(indexPairs(:,2),:);
-    disp(i);
-
-    
-    if length(matchedPoints1)<5 || length(matchedPoints2)<5
-            disp("skippede");
-            disp(size(matchedPoints1));
-            continue;
+    features{i} = features1;
+    valid{i} = validCorners1;
+end
+%%
+tree = cell(1,size(imageFiles,1));
+matches = cell(size(imageFiles,1),size(imageFiles,1));
+for i = 1:size(imageFiles,1)
+    for j = i+1:size(imageFiles,1)
+        feature1 = features{i};
+        feature2 = features{j};
+        [indexPairs,matchMetric] = matchFeatures(feature1.Features,feature2.Features);
+        val1 = valid{i};
+        val2 = valid{j};
+        matchedPoints1 = val1.Location(indexPairs(:,1),:);
+        matchedPoints2 = val2.Location(indexPairs(:,2),:);
+        if length(matchedPoints1)>5 && length(matchedPoints2)>5
+            tree{i}(end+1) = j;
+            tree{j}(end+1) = i;
+            matches{i,j} = matchedPoints1;
+            matches{j,i} = matchedPoints2;
+        end
     end
+end
+%%
+sequence = findCompletedSequence(tree, 1);
+disp(sequence);
+imageFiles = imageFiles(sequence);
+cam_pos_sorted = cam_pos_sorted(sequence);
 
-    [E, epipolarInliers] = estimateEssentialMatrix(matchedPoints1, matchedPoints2, intrinsics, Confidence = 99.99);
-
-    
+for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
+    [E, epipolarInliers] = estimateEssentialMatrix(matches{sequence(i),sequence(i+1)}, matches{sequence(i+1),sequence(i)}, intrinsics, Confidence = 80);
+    inlierPoints1 = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
+    inlierPoints2 = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
 end
