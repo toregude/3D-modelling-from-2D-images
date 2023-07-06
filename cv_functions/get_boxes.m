@@ -1,6 +1,6 @@
-function [origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes()
-    path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
-    global_coordinates = get_global_coordinates_list_test(path);%THIS SHOULD BE ACTUAL POINTCLOUD
+function [origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(global_coordinates)
+    %path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
+    %global_coordinates = get_global_coordinates_list_test(path);%THIS SHOULD BE ACTUAL POINTCLOUD
     data = global_coordinates;
     floor_level = find_floor_level(data);
     

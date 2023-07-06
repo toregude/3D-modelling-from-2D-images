@@ -151,9 +151,6 @@ ylabel('Y');
 zlabel('Z');
 title('3D Plot of Points');
 
-[origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all);
-
-
 %%
 % 
 % 

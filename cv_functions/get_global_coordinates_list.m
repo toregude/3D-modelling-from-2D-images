@@ -1,11 +1,9 @@
 
-clc;
-clear;
 
 path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
 
 global_coordinates = get_global_coordinates_list_test(path);
-
+%global_coordinates = points3D_all';
 %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
 
 % Create a sample point cloud data in a list format
@@ -22,7 +20,7 @@ floor_level = find_floor_level(data)
 
 
 
-[idx, corepoints] = dbscan(data, 0.2, 20);
+[idx, corepoints] = dbscan(data, 0.2, 5);
 numObjects = length(unique(idx)) - 1;
 
 max_room = max(data(idx ~= -1, 1:2))
@@ -243,11 +241,11 @@ function floor_level = find_floor_level(data)
     floor_level = minimum_floor;
     for i = 1:(length(z)-1)
         count = length(data(data(:, 3) < z(i+1))) - length(data(data(:, 3) <= z(i)));
-        if count < 30
+        if count < 5
             last_count = count;
             continue;
         else
-            if count/last_count > 10
+            if count/last_count > 3
                 floor_level = z(i);
                 break;
             end
