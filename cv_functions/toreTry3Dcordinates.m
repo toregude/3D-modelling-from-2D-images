@@ -22,15 +22,11 @@ cam_pos_unsorted = allData(:, 1:4);
 [cam_pos_sorted,sort_index] = sortrows(cam_pos_unsorted);
 imageFiles = imageFiles(sort_index);
 
-all_points_3D = [];
-all_color = [];
 image = im2gray(imread(imageFiles{1}));
-%IKKE SJEKKA KODE
 imageSize = size(image);
 focalLength = [K(1,1) K(2,2)];
 principalPoint = [K(1,3) K(2,3)];
 intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
-
 
 %% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
 [features,valid] = find_features(imageFiles);
@@ -44,86 +40,29 @@ imageFiles = imageFiles(sequence');
 cam_pos_sorted = cam_pos_unsorted(sequence,:);
 
 %%
-Es = cell(1,size(imageFiles,1)-1);
-inlierPoints1 = cell(1,size(imageFiles,1)-1);
-inlierPoints2 = cell(1,size(imageFiles,1)-1);
-
-R_tot = eye(3);
-T_tot = zeros(3,1);
-points3D_all = zeros(3,0);
-R_cell = cell(1,size(imageFiles,1) - 1);
-T_cell = cell(1,size(imageFiles,1) - 1);
-R_cell{1, 1} = R_tot;
-T_cell{1, 1} = T_tot;
-Points3D_cell = cell(1,size(imageFiles, 1) - 2);
-
-R_all = cell(1,size(imageFiles,1)-1);
-T_all = cell(1,size(imageFiles,1)-1);
-R_all{1}  = eye(3);
-T_all{1} = zeros(3,1);
+relPose_cell = cell(1,size(imageFiles,1)-1);
+points3D_all = [];
 for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
     %Regn ut 3D kordinater
-    % Es{i} = E;
-    % inlierPoints1{i} = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
-    % inlierPoints2{i} = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
-
     matchedPoints1 = matches{sequence(i),sequence(i+1)};
     matchedPoints2 = matches{sequence(i+1),sequence(i)};
     [E, epipolarInliers] = estimateEssentialMatrix(matchedPoints1, matchedPoints2, intrinsics, 'Confidence', 99.99);
-    ligma = i
 
     % Find epipolar inliers
     inlierPoints1 = matchedPoints1(epipolarInliers, :);
     inlierPoints2 = matchedPoints2(epipolarInliers, :);
-    correspondences = [inlierPoints1'; inlierPoints2'];
     
     relPose = estrelpose(E, intrinsics, inlierPoints1, inlierPoints2);
-    R = relPose(1).R;
-    T = relPose(1).Translation';
-
-    R_tot = R*R_tot;
-    T_tot = R*T_tot + T;
-
-    R_all{i+1} = R*R_all{i};
-    T_all{i+1} = R*T_all{i} + T;
-
-    R_cell{1, i+1} = R_tot;
-    T_cell{1, i+1} = T_tot;
-
-
-    I1 = imread(imageFiles{sequence(i)});
-    I2 = imread(imageFiles{sequence(i+1)});
-
-    % % border = 30;
-    % % roi = [border, border, size(I1, 2)- 2*border, size(I1, 1)- 2*border];
-    % % imagePoints1 = detectHarrisFeatures(im2gray(I1), ROI = roi, MinQuality = 0.001);
-    % % 
-    % % % Create the point tracker
-    % % tracker = vision.PointTracker();
-    % % 
-    % % % Initialize the point tracker
-    % % imagePoints1 = imagePoints1.Location;
-    % % initialize(tracker, imagePoints1, I1);
-    % % 
-    % % %Track the points
-    % % [imagePoints2, validIdx] = step(tracker, I2);
-    % % matchedPoints1 = imagePoints1(validIdx, :);
-    % % matchedPoints2 = imagePoints2(validIdx, :);
-
-
-    % transposePointForward(relPose,imagePoints1);
-    % R_all = R*R_all;
-    % T_all = R_all*T_all+ T;
-
+    relPose = relPose(1);
+    relPose_cell{i} = relPose;
 
     camMatrix1 = cameraProjection(intrinsics, rigidtform3d);
-    camMatrix2 = cameraProjection(intrinsics, pose2extr(relPose(1)));
-    % camMatrix2 = cameraProjection(intrinsics, pose);
-    % 
+    camMatrix2 = cameraProjection(intrinsics, pose2extr(relPose));
+
     % % Compute the 3-D points
-    points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2)';
-    points3D_cell{1, i} = points3D;
+    points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2);
     
+    points3D_all = transformPointsForward(relPose, [points3D_all; points3D]);
 end
 
 % % R_inverted_cell = cell(1,size(imageFiles,1)-  1);
@@ -132,20 +71,11 @@ end
 % % T_temp = zeros(3, 1);
 
 
-for i = 1:size(imageFiles, 1)-2
-    R_cell{1, i} = R_cell{1, end}*R_cell{1, i}^-1;
-    T_cell{1, i} = R_cell{1, i}^-1*T_cell{1, i};
-end
-
-for i = 1:size(imageFiles, 1)-2
-    points3D_cell{1, i} = R_cell{1, i}*points3D_cell{1, i} + T_cell{1, i};
-    points3D_all = [points3D_all, points3D_cell{1, i}];
-end
 
 
 %% 
 for i = 1:size(imageFiles,1)-2
-    for j = 1:size(imageFiles,1)-2
+    for j = i:size(imageFiles,1)-2
         if numel(matches{sequence(i),sequence(j)}) >15
             matchedPoints1 = matches{sequence(i),sequence(j)};
             matchedPoints2 = matches{sequence(j),sequence(i)};
@@ -162,8 +92,10 @@ for i = 1:size(imageFiles,1)-2
             camMatrix1 = cameraProjection(intrinsics, rigidtform3d);
             camMatrix2 = cameraProjection(intrinsics, pose2extr(relPose(1)));
             points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2);
-            a = R_all{sequence(i+1)}\((points3D-T_all{sequence(i+1)}')');
-            points3D_all = [points3D_all, a];
+
+            points = transform_points(sequence(i),sequence(end),points3D,relPose_cell);
+
+            points3D_all = [points3D_all; points];
     
         end
     end
@@ -172,6 +104,7 @@ end
 %%
 
 % Extract x, y, and z coordinates from the array
+points3D_all = points3D_all';
 x = points3D_all(1, :);
 y = points3D_all(2, :);
 z = points3D_all(3, :);
@@ -184,7 +117,7 @@ ylabel('Y');
 zlabel('Z');
 title('3D Plot of Points');
 
-[origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all);
+[origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all');
 
 
 %%
