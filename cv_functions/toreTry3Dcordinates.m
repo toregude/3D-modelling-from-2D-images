@@ -1,3 +1,4 @@
+%%
 % Specify the path to the subfolder containing the images
 subfolderPath = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\images";
 
@@ -36,31 +37,91 @@ intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 [tree, matches] = find_match_tree(features,valid, imageFiles);
 sequence = findCompletedSequence(tree, 1);
 disp(sequence);
+%%
 %Bare sortering av bildene og kameraposisjonene, sortering av bilder tror
 %jeg ikke trengs
-imageFiles = imageFiles(sequence);
-cam_pos_sorted = cam_pos_sorted(sequence);
+imageFiles = imageFiles(sequence');
+cam_pos_sorted = cam_pos_unsorted(sequence,:);
 
+%%
 Es = cell(1,size(imageFiles,1)-1);
 inlierPoints1 = cell(1,size(imageFiles,1)-1);
 inlierPoints2 = cell(1,size(imageFiles,1)-1);
 
-%Akkurat hva som må gjøres her vet jeg ikke. Per nå lagres 
-%alle Eene og inliersa i en cell, men kanskje bedre å direkte
-%her regne ut 3D koordinater?
+R_all = eye(3);
+T_all = zeros(1,3);
+points3D_all = zeros(3,1);
 for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
-    [E, epipolarInliers] = estimateEssentialMatrix(matches{sequence(i),sequence(i+1)}, matches{sequence(i+1),sequence(i)}, intrinsics, Confidence = 0.99);
-    
-    matchPoints1 = matches{sequence(i),sequence(i+1)};
-    matchPoints2 = matches{sequence(i+1),sequence(i)};
-    
     %Regn ut 3D kordinater
-    Es{i} = E;
-    inlierPoints1{i} = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
-    inlierPoints2{i} = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
+    % Es{i} = E;
+    % inlierPoints1{i} = matches{sequence(i),sequence(i+1)}(epipolarInliers, :);
+    % inlierPoints2{i} = matches{sequence(i+1),sequence(i)}(epipolarInliers, :);
+
+    matchedPoints1 = matches{sequence(i),sequence(i+1)};
+    matchedPoints2 = matches{sequence(i+1),sequence(i)};
+    [E, epipolarInliers] = estimateEssentialMatrix(matchedPoints1, matchedPoints2, intrinsics, Confidence = 0.99);
+
+    % Find epipolar inliers
+    inlierPoints1 = matchedPoints1(epipolarInliers, :);
+    inlierPoints2 = matchedPoints2(epipolarInliers, :);
+    correspondences = [inlierPoints1'; inlierPoints2'];
+    
+    relPose = estrelpose(E, intrinsics, inlierPoints1, inlierPoints2);
+    R = relPose(1).R;
+    T = relPose(1).Translation;
+
+
+    I1 = imread(imageFiles{sequence(i)});
+    I2 = imread(imageFiles{sequence(i+1)});
+
+    border = 30;
+    roi = [border, border, size(I1, 2)- 2*border, size(I1, 1)- 2*border];
+    imagePoints1 = detectHarrisFeatures(im2gray(I1), ROI = roi, MinQuality = 0.001);
+
+    % Create the point tracker
+    tracker = vision.PointTracker();
+
+    % Initialize the point tracker
+    imagePoints1 = imagePoints1.Location;
+    initialize(tracker, imagePoints1, I1);
+
+    % Track the points
+    [imagePoints2, validIdx] = step(tracker, I2);
+    matchedPoints1 = imagePoints1(validIdx, :);
+    matchedPoints2 = imagePoints2(validIdx, :);
+
+
+    % transposePointForward(relPose,imagePoints1);
+    R_all = R*R_all;
+    T_all = T_all+ T;
+    camMatrix1 = cameraProjection(intrinsics, rigidtform3d);
+    camMatrix2 = cameraProjection(intrinsics, pose2extr(relPose(1)));
+    % camMatrix2 = cameraProjection(intrinsics, pose);
+    % 
+    % % Compute the 3-D points
+    points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2);
+    a = points3D/R_all+T_all;
+    points3D_all = [points3D_all, a'];
+    
 end
 
 %% 
+
+
+% Extract x, y, and z coordinates from the array
+x = points3D_all(1, :);
+y = points3D_all(2, :);
+z = points3D_all(3, :);
+
+% Plot the points in a 3D plot using scatter3
+figure;
+scatter3(x, y, z, 'filled');
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+title('3D Plot of Points');
+
+%%
 % 
 % 
 % 
