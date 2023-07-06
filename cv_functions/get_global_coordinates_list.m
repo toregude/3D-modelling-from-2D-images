@@ -21,7 +21,7 @@ floor_level = find_floor_level(data)
 
 
 
-[idx, corepoints] = dbscan(data, 0.1, 20);
+[idx, corepoints] = dbscan(data, 0.1, 15);
 numObjects = length(unique(idx)) - 1;
 
 max_room = max(data(idx ~= -1, 1:2))
@@ -87,52 +87,7 @@ hold off;
 
 
 
-% % % % % % % Set the maximum desired distance between points within clusters
-% % % % % % maxDistance = 2.0;
-% % % % % % 
-% % % % % % % Calculate the pairwise distances between points using vectorization
-% % % % % % numPoints = size(point_cloud_data, 1);
-% % % % % % distances = sqrt(sum((reshape(point_cloud_data, [1, numPoints, 3]) - reshape(point_cloud_data, [numPoints, 1, 3])).^2, 3));
-% % % % % % 
-% % % % % % % Perform agglomerative hierarchical clustering
-% % % % % % clusters = 1:numPoints;
-% % % % % % clusterCount = numPoints
-% % % % % % a = 0;
-% % % % % % 
-% % % % % % while clusterCount > 1
-% % % % % %     [minDistance, minIndex] = min(distances(:));
-% % % % % %     [row, col] = ind2sub([numPoints, numPoints], minIndex);
-% % % % % % 
-% % % % % %     if minDistance > maxDistance
-% % % % % %         break;
-% % % % % %     end
-% % % % % % 
-% % % % % %     clusters(clusters == clusters(col)) = clusters(row);
-% % % % % %     clusterCount = clusterCount - 1;
-% % % % % % 
-% % % % % %     distances([row, col], :) = maxDistance + 1; % Set distances to a large value
-% % % % % %     distances(:, [row, col]) = maxDistance + 1;
-% % % % % % 
-% % % % % %     for j = 1:numPoints
-% % % % % %         if clusters(j) == clusters(row)
-% % % % % %             distances(row, j) = min(distances(row, j), distances(col, j));
-% % % % % %             distances(j, row) = distances(row, j);
-% % % % % %         end
-% % % % % %     end
-% % % % % %     a = a + 1;
-% % % % % %     if mod(a, 100) == 0
-% % % % % %         a
-% % % % % %     end
-% % % % % % end
-% % % % % % 
-% % % % % % % Plot the results
-% % % % % % figure;
-% % % % % % scatter3(point_cloud_data(:,1), point_cloud_data(:,2), point_cloud_data(:,3), 36, clusters, 'filled');
-% % % % % % title('Point Cloud Clustering');
-% % % % % % xlabel('X');
-% % % % % % ylabel('Y');
-% % % % % % zlabel('Z');
-% % % % % % grid on;
+
 
 
 
@@ -242,11 +197,11 @@ function floor_level = find_floor_level(data)
     floor_level = minimum_floor;
     for i = 1:(length(z)-1)
         count = length(data(data(:, 3) < z(i+1))) - length(data(data(:, 3) <= z(i)));
-        if count < 30
+        if count < 20
             last_count = count;
             continue;
         else
-            if count/last_count > 8
+            if count/last_count > 5
                 floor_level = z(i);
                 break;
             end
