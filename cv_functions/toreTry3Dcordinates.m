@@ -56,6 +56,11 @@ T_cell = cell(1,size(imageFiles,1) - 1);
 R_cell{1, 1} = R_tot;
 T_cell{1, 1} = T_tot;
 Points3D_cell = cell(1,size(imageFiles, 1) - 2);
+
+R_all = cell(1,size(imageFiles,1)-1);
+T_all = cell(1,size(imageFiles,1)-1);
+R_all{1}  = eye(3);
+T_all{1} = zeros(3,1);
 for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
     %Regn ut 3D kordinater
     % Es{i} = E;
@@ -78,6 +83,9 @@ for i = 1:size(imageFiles,1)-2 % Usikker på hvorfor det må være -2 og ikke -1
 
     R_tot = R*R_tot;
     T_tot = R*T_tot + T;
+
+    R_all{i+1} = R*R_all{i};
+    T_all{i+1} = R*T_all{i} + T;
 
     R_cell{1, i+1} = R_tot;
     T_cell{1, i+1} = T_tot;
@@ -136,7 +144,32 @@ end
 
 
 %% 
+for i = 1:size(imageFiles,1)-2
+    for j = 1:size(imageFiles,1)-2
+        if numel(matches{sequence(i),sequence(j)}) >15
+            matchedPoints1 = matches{sequence(i),sequence(j)};
+            matchedPoints2 = matches{sequence(j),sequence(i)};
 
+            
+            [E, epipolarInliers] = estimateEssentialMatrix(matchedPoints1, matchedPoints2, intrinsics, Confidence = 99.99);
+
+            % Find epipolar inliers
+            inlierPoints1 = matchedPoints1(epipolarInliers, :);
+            inlierPoints2 = matchedPoints2(epipolarInliers, :);
+            correspondences = [inlierPoints1'; inlierPoints2'];
+            
+            relPose = estrelpose(E, intrinsics, inlierPoints1, inlierPoints2);
+            camMatrix1 = cameraProjection(intrinsics, rigidtform3d);
+            camMatrix2 = cameraProjection(intrinsics, pose2extr(relPose(1)));
+            points3D = triangulate(matchedPoints1, matchedPoints2, camMatrix1, camMatrix2);
+            a = R_all{sequence(i+1)}\((points3D-T_all{sequence(i+1)}')');
+            points3D_all = [points3D_all, a];
+    
+        end
+    end
+    disp(i);
+end
+%%
 
 % Extract x, y, and z coordinates from the array
 x = points3D_all(1, :);
