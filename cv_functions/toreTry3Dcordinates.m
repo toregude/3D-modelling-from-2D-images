@@ -36,7 +36,8 @@ principalPoint = [K(1,3) K(2,3)];
 intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 
 %% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
-[features,valid] = find_features(imageFiles);
+[features,valid] = find_features(imageFiles, intrinsics);
+%% 
 [tree, matches] = find_match_tree(features,valid, imageFiles);
 sequence = findCompletedSequence(tree, 1);
 disp(sequence);
@@ -47,21 +48,62 @@ num_imageFiles = size(imageFiles,1);
 
 %% 
 points3D_all = get_all_3D_points(points3D_all, num_imageFiles, matches, sequence, relPose_cell, intrinsics);
+%%
+get_global_coordinates_list(points3D_all);
+%%
+% 
+% % Extract x, y, and z coordinates from the array
+% points3D_all = points3D_all';
+% x = points3D_all(1, :);
+% y = points3D_all(2, :);
+% z = points3D_all(3, :);
+% 
+% % Plot the points in a 3D plot using scatter3
+% figure;
+% scatter3(x, y, z, 'filled');
+% xlabel('X');
+% ylabel('Y');
+% zlabel('Z');
+% title('3D Plot of Points');
+% 
+% [origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all');
 
 %%
 
-% Extract x, y, and z coordinates from the array
-points3D_all = points3D_all';
-x = points3D_all(1, :);
-y = points3D_all(2, :);
-z = points3D_all(3, :);
-
-% Plot the points in a 3D plot using scatter3
+point = [0, 0, 0];
 figure;
-scatter3(x, y, z, 'filled');
+hold on;
+prevPoint = point;
+% Iterate through each transformation
+for i = 1:29
+    all = relPose_cell{1,i};
+    t = all.Translation;
+    R = all.R;
+    disp(t);
+    disp(R);
+    % Apply rotation and translation to the point
+    rotatedPoint = R * point' + t';
+    scatter3(rotatedPoint(1), rotatedPoint(2), rotatedPoint(3), 'filled');
+
+   % Draw a line between the previous and current points
+    line([prevPoint(1), rotatedPoint(1)], [prevPoint(2), rotatedPoint(2)], [prevPoint(3), rotatedPoint(3)]);
+    
+    % Update the previous point position
+    prevPoint = rotatedPoint';
+    
+    % Update the point position for the next iteration
+    point = rotatedPoint';
+end
+
+% Set axis labels and plot title
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('3D Plot of Points');
+title('Movement of Point');
 
-[origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all');
+% Adjust plot settings
+axis equal;
+grid on;
+
+% Disable hold mode
+hold off;
