@@ -4,8 +4,7 @@ function [transformed_points] = transform_points(sequence_start_frame_index, seq
     %for the start and end
     
     transformed_points = points;
-    for i = sequence_start_frame_index:(sequence_end_frame_index-2)
-        disp(relPose_cell{i});
+    for i = sequence_start_frame_index:(sequence_end_frame_index-2)%%Her burde vi sende inn i-2, ikke ta minus to her
         transformed_points = transformPointsForward(relPose_cell{i}, transformed_points);
     end
 
