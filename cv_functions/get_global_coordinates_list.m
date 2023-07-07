@@ -1,7 +1,10 @@
 function get_global_coordinates_list(points3D_all)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
-    
+    y = points3D_all(:,2);
+    z = points3D_all(:,3);
+    points3D_all(:,3) = y;
+    points3D_all(:,2) = z;
     %global_coordinates = get_global_coordinates_list_test(path);
     global_coordinates = points3D_all; %Bare for å teste med våre koordinater
     % Må kjøre toreTry3Dcordinates.m først

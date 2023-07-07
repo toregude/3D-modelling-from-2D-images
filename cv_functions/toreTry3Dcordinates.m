@@ -3,7 +3,7 @@
 % subfolderPath = ".\test_data_kicker\images";
 %%
 % Specify the path to the subfolder containing the images
-subfolderPath = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\images";
+subfolderPath = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\images\dslr_images_undistorted";
 
 % Get a list of all files and folders in the subfolder
 files = dir(fullfile(subfolderPath, '*.JPG'));  % Modify the file extension as needed
@@ -18,16 +18,16 @@ end
 
 %Calibration matrix for the kicker
 % K_path = ".\test_data_kicker\parameters";
-K_path = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\parameters";
+K_path = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted";
 [K] = K_from_cameraparams(K_path);
 % 
 % % allData = readmatrix(".\test_data_kicker\parameters\images.txt");
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
-allData = readmatrix("C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\parameters\images.txt");
-cam_pos_unsorted = allData(:, 1:4);
-[cam_pos_sorted,sort_index] = sortrows(cam_pos_unsorted);
-imageFiles = imageFiles(sort_index);
+% allData = readmatrix("C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\parameters\images.txt");
+% cam_pos_unsorted = allData(:, 1:4);
+% [cam_pos_sorted,sort_index] = sortrows(cam_pos_unsorted);
+% imageFiles = imageFiles(sort_index);
 
 image = im2gray(imread(imageFiles{1}));
 imageSize = size(image);
@@ -40,11 +40,19 @@ intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 %% 
 [tree, matches] = find_match_tree(features,valid, imageFiles);
 sequence = findCompletedSequence(tree, 1);
+
 disp(sequence);
+%%
+% campos_indices = cam_pos_unsorted(sequence,:);
+% campos_seq = campos_indices(:,2:4);
+% scale_factor = zeros(size(campos_seq,1)-1);
+% for i = 1:size(campos_seq,1)-1
+%     scale_factor(i) = (abs(campos_seq(i)-campos_seq(i+1)));
+% end
 
 %%
 num_imageFiles = size(imageFiles,1);
-[relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles);
+[relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K);
 
 %% 
 points3D_all = get_all_3D_points(points3D_all, num_imageFiles, matches, sequence, relPose_cell, intrinsics);
@@ -70,19 +78,24 @@ get_global_coordinates_list(points3D_all);
 
 %%
 
-point = [0, 0, 0];
+point = [0, 0, 0]';
 figure;
 hold on;
 prevPoint = point;
 % Iterate through each transformation
 for i = 1:29
     all = relPose_cell{1,i};
+    % all.Translation(3) = 0;
     t = all.Translation;
+
     R = all.R;
     disp(t);
     disp(R);
     % Apply rotation and translation to the point
-    rotatedPoint = R * point' + t';
+    % rotatedPoint = R * point' + t';
+    % disp(point);
+    rotatedPoint = transformPointsForward(relPose_cell{i}, point');
+
     scatter3(rotatedPoint(1), rotatedPoint(2), rotatedPoint(3), 'filled');
 
    % Draw a line between the previous and current points
@@ -107,3 +120,4 @@ grid on;
 
 % Disable hold mode
 hold off;
+
