@@ -3,6 +3,9 @@ function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, s
     points3D_all = [];
 
     for i = 1:num_imageFiles-2 % Usikker på hvorfor det må være -2 og ikke -1, virker som at siste bildet ikke blir sortert
+        "Så langt kommer vi"
+        i
+        
         %Regn ut 3D kordinater
         matchedPoints1 = matches{sequence(i),sequence(i+1)};
         matchedPoints2 = matches{sequence(i+1),sequence(i)};
