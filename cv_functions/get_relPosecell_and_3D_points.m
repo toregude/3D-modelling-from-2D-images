@@ -32,19 +32,8 @@ function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, s
             relPose = relPose(best);
             % disp(best);
         end
-        %OBS OBS OBS OBS -----------------------------------
-        disp(i);
-        disp(norm(relPose.Translation));
-        % relPose.Translation = relPose.Translation.*scale_factor(i); %%%OBS OBS OVS 
-        % disp(norm(relPose.Translation));
-        % disp(scale_factor(i));
-        a = relPose.A;
-        a(1:3,4) = a(1:3,4)*scale_factor(i);
-        relPose.A = a;
-        disp(norm(relPose.Translation));
-        disp(scale_factor(i));
-        %--------------------
-        
+ 
+        relPose.A(1:3,4) = relPose.A(1:3,4)*scale_factor(i);       
         relPose_cell{i} = relPose;
     
         camMatrix1 = cameraProjection(intrinsics, rigidtform3d);
