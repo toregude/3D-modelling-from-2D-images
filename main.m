@@ -29,12 +29,11 @@ principalPoint = [K(1,3) K(2,3)];
 intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 
 %% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
-[features,valid] = find_features(imageFiles, intrinsics);
+[features, valid_points] = find_features(imageFiles,intrinsics);
 %% 
-[tree, matches] = find_match_tree(features,valid, imageFiles);
-sequence = find_completed_sequence(tree, 1);
+[G, matches] = find_match_graph(features, valid_points, imageFiles);
+sequence = dfsearch(G,1)';
 
-disp(sequence);
 %%
 scale_factor = find_scale_factor(cam_pos_sorted, sequence);
 %%
