@@ -1,5 +1,3 @@
-
-
 function roof_level = find_roof_level(data)
     minimum_roof = -10.;
     maximum_roof = 10.;

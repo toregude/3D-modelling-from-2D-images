@@ -11,12 +11,7 @@ function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, s
         % Find epipolar inliers
         inlierPoints1 = matchedPoints1(epipolarInliers, :);
         inlierPoints2 = matchedPoints2(epipolarInliers, :);
-        
-        % [T1, T2, R1, R2] = TR_from_E(E);
-        % correspondences = [inlierPoints1'; inlierPoints2'];
-        % [T, R, lambda, P1, camC1, camC2] = reconstruction(T1, T2, R1, R2, correspondences, K);
-        % relPose = rigidtform3d(R,T);
-        % disp(relPose);
+
         relPose = estrelpose(E, intrinsics, inlierPoints1, inlierPoints2);
         
         if size(relPose,1) >1

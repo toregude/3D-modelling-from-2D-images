@@ -1,5 +1,5 @@
 
-function drawBox(origin, sideLengths)
+function draw_box(origin, sideLengths)
     % Extract coordinates of the origin
     x = origin(1);
     y = origin(2);

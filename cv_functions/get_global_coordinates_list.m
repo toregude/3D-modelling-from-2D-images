@@ -2,7 +2,7 @@ function get_global_coordinates_list(path)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
     
-    global_coordinates = get_global_coordinates_list_test(path);
+    % global_coordinates = get_global_coordinates_list_test(path);
     
     % Må kjøre toreTry3Dcordinates.m først
     %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
@@ -24,8 +24,8 @@ function get_global_coordinates_list(path)
     [idx, corepoints] = dbscan(data, 0.2, 20);
     numObjects = length(unique(idx)) - 1;
     
-    max_room = max(data(idx ~= -1, 1:2))
-    min_room = min(data(idx ~= -1, 1:2))
+    max_room = max(data(idx ~= -1, 1:2));
+    min_room = min(data(idx ~= -1, 1:2));
     
     
     
@@ -52,7 +52,7 @@ function get_global_coordinates_list(path)
     figure
     hold on;
     for i = 1:numObjects
-        drawBox(senterliste(i,:), lengdeliste(i,:));
+        draw_box(senterliste(i,:), lengdeliste(i,:));
     end
     
     X = [min_room(1), min_room(1), max_room(1), max_room(1)];
@@ -61,7 +61,7 @@ function get_global_coordinates_list(path)
     
     
     patch('XData', X, 'YData', Y, 'ZData', Z);
-    list_of_walls_x = sette_inn_vegger_x(data(idx ~= -1, :));
+    list_of_walls_x = find_walls_x_pos(data(idx ~= -1, :));
     for i = 1:size(list_of_walls_x, 1)
         X = [list_of_walls_x(i, 1), list_of_walls_x(i, 1), list_of_walls_x(i, 1), list_of_walls_x(i, 1)];
         Y = [list_of_walls_x(i, 2), list_of_walls_x(i, 3), list_of_walls_x(i, 3), list_of_walls_x(i, 2)];
@@ -70,7 +70,7 @@ function get_global_coordinates_list(path)
         
     end
 
-    list_of_walls_y = sette_inn_vegger_y(data(idx ~= -1, :));
+    list_of_walls_y = find_walls_y_pos(data(idx ~= -1, :));
     for i = 1:size(list_of_walls_y, 1)
         Y = [list_of_walls_y(i, 1), list_of_walls_y(i, 1), list_of_walls_y(i, 1), list_of_walls_y(i, 1)];
         X = [list_of_walls_y(i, 2), list_of_walls_y(i, 3), list_of_walls_y(i, 3), list_of_walls_y(i, 2)];
@@ -79,7 +79,7 @@ function get_global_coordinates_list(path)
         
     end
     
-    list_of_walls_x_neg = sette_inn_vegger_x_neg(data(idx ~= -1, :));
+    list_of_walls_x_neg = find_walls_x_neg(data(idx ~= -1, :));
     for i = 1:size(list_of_walls_x_neg, 1)
         X = [list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1)];
         Y = [list_of_walls_x_neg(i, 2), list_of_walls_x_neg(i, 3), list_of_walls_x_neg(i, 3), list_of_walls_x_neg(i, 2)];
@@ -88,7 +88,7 @@ function get_global_coordinates_list(path)
         
     end
     
-    list_of_walls_y_neg = sette_inn_vegger_y_neg(data(idx ~= -1, :));
+    list_of_walls_y_neg = find_walls_y_neg(data(idx ~= -1, :));
     for i = 1:size(list_of_walls_y_neg, 1)
         Y = [list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1)];
         X = [list_of_walls_y_neg(i, 2), list_of_walls_y_neg(i, 3), list_of_walls_y_neg(i, 3), list_of_walls_y_neg(i, 2)];

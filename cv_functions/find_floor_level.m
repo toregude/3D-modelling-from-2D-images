@@ -1,6 +1,3 @@
-
-
-%%Funksjonen gir ikke floo level
 function floor_level = find_floor_level(data)
     minimum_floor = -10.;
     maximum_floor = 10.;

@@ -1,4 +1,4 @@
-function sequence = findCompletedSequence(cellArray, startNode)
+function sequence = find_completed_sequence(cellArray, startNode)
     visited = false(size(cellArray));
     sequence = [];
     dfs(startNode);

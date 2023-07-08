@@ -1,5 +1,3 @@
-
-
 function global_coordinates = get_global_coordinates_list_test(path)
     no_lines = count_lines(path);
     no_coords = no_lines - 3;

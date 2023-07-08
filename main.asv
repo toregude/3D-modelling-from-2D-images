@@ -1,10 +1,9 @@
 %%
+addpath('cv_functions');
+addpath('GUI');
 % Specify the path to the subfolder containing the images
-% subfolderPath = ".\test_data_kicker\images";
-%%
-% Specify the path to the subfolder containing the images
-subfolderPath = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\images";
-
+subfolderPath = ".\test_data_kicker\images";
+ 
 % Get a list of all files and folders in the subfolder
 files = dir(fullfile(subfolderPath, '*.JPG'));  % Modify the file extension as needed
 
@@ -17,20 +16,17 @@ for i = 1:numel(files)
 end
 
 %Calibration matrix for the kicker
-% K_path = ".\test_data_kicker\parameters";
-K_path = "C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\parameters";
-[K] = K_from_cameraparams(K_path);
-% 
-% % allData = readmatrix(".\test_data_kicker\parameters\images.txt");
+K_path = ".\test_data_kicker\parameters";
+K = K_from_cameraparams(K_path);
+
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
-allData = readmatrix("C:\Users\Tore Gude\OneDrive - NTNU\Termin 8 - Tyskland\Computer Vision\Prosjekt\Computer-Vision-gutta\test_data_kicker\parameters\images.txt");
+allData = readmatrix(".\test_data_kicker\parameters\images.txt");
 cam_pos_unsorted = allData(:, 1:4);
 [cam_pos_sorted,sort_index] = sortrows(cam_pos_unsorted);
 imageFiles = imageFiles(sort_index);
 
-image = im2gray(imread(imageFiles{1}));
-imageSize = size(image);
+imageSize = size(imread(imageFiles{1}));
 focalLength = [K(1,1) K(2,2)];
 principalPoint = [K(1,3) K(2,3)];
 intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
@@ -58,22 +54,5 @@ num_imageFiles = size(imageFiles,1);
 points3D_all = get_all_3D_points(points3D_all, num_imageFiles, matches, sequence, relPose_cell, intrinsics);
 %%
 get_global_coordinates_list(points3D_all);
-%%
-% 
-% % Extract x, y, and z coordinates from the array
-% points3D_all = points3D_all';
-% x = points3D_all(1, :);
-% y = points3D_all(2, :);
-% z = points3D_all(3, :);
-% 
-% % Plot the points in a 3D plot using scatter3
-% figure;
-% scatter3(x, y, z, 'filled');
-% xlabel('X');
-% ylabel('Y');
-% zlabel('Z');
-% title('3D Plot of Points');
-% 
-% [origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all');
 
 %

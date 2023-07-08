@@ -1,6 +1,4 @@
-
-
-function valid_wall_list = sette_inn_vegger_x(global_coords)
+function valid_wall_list = find_walls_x_pos(global_coords)
     data = global_coords;
     min_x = -30.;
     max_x = 30.;

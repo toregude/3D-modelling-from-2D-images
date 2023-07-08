@@ -1,16 +1,3 @@
-
-
-% Hva som må gjøres i GUI
-% legge inn en fil med bildene
-% eksempel kicker_dslr_...
-% denne konkattineres med \camera.txt filen
-% Finnes det en måte å hente ut dette direkte dersom vi ikke vet navnet
-% allerede?
-% Vi har i alle fall kamera.txt, så denne vil funke
-
-
-
-
 function [K] = K_from_cameraparams(path)
     path = fullfile(path, '\cameras.txt');
     fid = fopen(path);
