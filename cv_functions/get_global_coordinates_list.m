@@ -1,9 +1,9 @@
-function get_global_coordinates_list(points3D_all)
+function get_global_coordinates_list(path)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
     
-    %global_coordinates = get_global_coordinates_list_test(path);
-    global_coordinates = points3D_all; %Bare for å teste med våre koordinater
+    global_coordinates = get_global_coordinates_list_test(path);
+    %global_coordinates = points3D_all; %Bare for å teste med våre koordinater
     % Må kjøre toreTry3Dcordinates.m først
     %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
     
@@ -18,10 +18,10 @@ function get_global_coordinates_list(points3D_all)
     %     2.0, 4.7, 1.8;
     %     % Add more points as needed
     % ];
+    roof_level = find_roof_level(data);
     
     
-    
-    [idx, corepoints] = dbscan(data, 0.1, 15);
+    [idx, corepoints] = dbscan(data, 0.2, 20);
     numObjects = length(unique(idx)) - 1;
     
     max_room = max(data(idx ~= -1, 1:2))
@@ -61,10 +61,44 @@ function get_global_coordinates_list(points3D_all)
     
     
     patch('XData', X, 'YData', Y, 'ZData', Z);
+    list_of_walls_x = sette_inn_vegger_x(data(idx ~= -1, :));
+    for i = 1:size(list_of_walls_x, 1)
+        X = [list_of_walls_x(i, 1), list_of_walls_x(i, 1), list_of_walls_x(i, 1), list_of_walls_x(i, 1)];
+        Y = [list_of_walls_x(i, 2), list_of_walls_x(i, 3), list_of_walls_x(i, 3), list_of_walls_x(i, 2)];
+        Z = [floor_level, floor_level, roof_level, roof_level];
+        patch('XData', X, 'YData', Y, 'ZData', Z, 'FaceColor','red');
+        
+    end
+
+    list_of_walls_y = sette_inn_vegger_y(data(idx ~= -1, :));
+    for i = 1:size(list_of_walls_y, 1)
+        Y = [list_of_walls_y(i, 1), list_of_walls_y(i, 1), list_of_walls_y(i, 1), list_of_walls_y(i, 1)];
+        X = [list_of_walls_y(i, 2), list_of_walls_y(i, 3), list_of_walls_y(i, 3), list_of_walls_y(i, 2)];
+        Z = [floor_level, floor_level, roof_level, roof_level];
+        patch('XData', X, 'YData', Y, 'ZData', Z, 'FaceColor','red');
+        
+    end
     
+    list_of_walls_x_neg = sette_inn_vegger_x_neg(data(idx ~= -1, :));
+    for i = 1:size(list_of_walls_x_neg, 1)
+        X = [list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1), list_of_walls_x_neg(i, 1)];
+        Y = [list_of_walls_x_neg(i, 2), list_of_walls_x_neg(i, 3), list_of_walls_x_neg(i, 3), list_of_walls_x_neg(i, 2)];
+        Z = [floor_level, floor_level, roof_level, roof_level];
+        patch('XData', X, 'YData', Y, 'ZData', Z, 'FaceColor','red');
+        
+    end
     
+    list_of_walls_y_neg = sette_inn_vegger_y_neg(data(idx ~= -1, :));
+    for i = 1:size(list_of_walls_y_neg, 1)
+        Y = [list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1), list_of_walls_y_neg(i, 1)];
+        X = [list_of_walls_y_neg(i, 2), list_of_walls_y_neg(i, 3), list_of_walls_y_neg(i, 3), list_of_walls_y_neg(i, 2)];
+        Z = [floor_level, floor_level, roof_level, roof_level];
+        patch('XData', X, 'YData', Y, 'ZData', Z, 'FaceColor','red');
+        
+    end
+
     
-    
+    % IKKE SLETT DENNE
     % % % for i = 1:size(data, 1)
     % % %     if (idx(i) == -1)
     % % %         continue
