@@ -40,11 +40,19 @@ intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 %% 
 [tree, matches] = find_match_tree(features,valid, imageFiles);
 sequence = findCompletedSequence(tree, 1);
+
 disp(sequence);
+%%
+campos_indices = cam_pos_sorted(sequence,:);
+campos_seq = campos_indices(:,2:4);
+scale_factor = zeros(size(campos_seq,1)-1,1);
+for i = 1:size(campos_seq,1)-1
+    scale_factor(i) = (abs(campos_seq(i)-campos_seq(i+1)));
+end
 
 %%
 num_imageFiles = size(imageFiles,1);
-[relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles);
+[relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K,scale_factor);
 
 %% 
 points3D_all = get_all_3D_points(points3D_all, num_imageFiles, matches, sequence, relPose_cell, intrinsics);
@@ -68,42 +76,4 @@ get_global_coordinates_list(points3D_all);
 % 
 % [origin, sideLength, X_floor, Y_floor, Z_floor] = get_boxes(points3D_all');
 
-%%
-
-point = [0, 0, 0];
-figure;
-hold on;
-prevPoint = point;
-% Iterate through each transformation
-for i = 1:29
-    all = relPose_cell{1,i};
-    t = all.Translation;
-    R = all.R;
-    disp(t);
-    disp(R);
-    % Apply rotation and translation to the point
-    rotatedPoint = R * point' + t';
-    scatter3(rotatedPoint(1), rotatedPoint(2), rotatedPoint(3), 'filled');
-
-   % Draw a line between the previous and current points
-    line([prevPoint(1), rotatedPoint(1)], [prevPoint(2), rotatedPoint(2)], [prevPoint(3), rotatedPoint(3)]);
-    
-    % Update the previous point position
-    prevPoint = rotatedPoint';
-    
-    % Update the point position for the next iteration
-    point = rotatedPoint';
-end
-
-% Set axis labels and plot title
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-title('Movement of Point');
-
-% Adjust plot settings
-axis equal;
-grid on;
-
-% Disable hold mode
-hold off;
+%
