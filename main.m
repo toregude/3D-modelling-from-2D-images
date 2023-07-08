@@ -10,22 +10,12 @@ uiwait(app.UIFigure);
 
 % Specify the path to the subfolder containing the images
 subfolderPath = ".\test_data_kicker\images";
- 
-% Get a list of all files and folders in the subfolder
-%files = dir(fullfile(subfolderPath, '*.JPG'));  % Modify the file extension as needed
 
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
-%imagestxt = app.imagestxt;
-%camerastxt = app.camerastxt;
 
-% Store the file names in the array. THEY ARE ACTUALLY SORTED!
-% for i = 1:numel(files)
-%     imageFiles{i} = fullfile(subfolderPath, files(i).name);
-% end
 
 %Calibration matrix for the kicker
-%K_path = ".\test_data_kicker\parameters";
 K = K_from_cameraparams(app.camerastxt);
 
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
