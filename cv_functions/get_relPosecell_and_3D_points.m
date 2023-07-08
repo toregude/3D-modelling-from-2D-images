@@ -1,4 +1,4 @@
-function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K)
+function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K,scale_factor)
     relPose_cell = cell(1,num_imageFiles-1);
     points3D_all = [];
 
@@ -30,11 +30,20 @@ function [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, s
                 end
             end
             relPose = relPose(best);
-            disp(best);
+            % disp(best);
         end
         %OBS OBS OBS OBS -----------------------------------
-        % relPose.Translation = scale_factor(i) * relPose.Translation; %%%OBS OBS OVS 
-        
+        disp(i);
+        disp(norm(relPose.Translation));
+        % relPose.Translation = relPose.Translation.*scale_factor(i); %%%OBS OBS OVS 
+        % disp(norm(relPose.Translation));
+        % disp(scale_factor(i));
+        a = relPose.A;
+        a(1:3,4) = a(1:3,4)*scale_factor(i);
+        relPose.A = a;
+        disp(norm(relPose.Translation));
+        disp(scale_factor(i));
+        %--------------------
         
         relPose_cell{i} = relPose;
     
