@@ -38,14 +38,14 @@ scale_factor = find_scale_factor(app.imagestxt, matches);
 waitbar(3/5,app.mywaitbar, 'Creating 3D points');
 
 %%
-relative_pose_cell = get_relative_pose_cell(matches, intrinsics, scale_factor);
+[relative_pose_cell, matches] = get_relative_pose_cell(matches, intrinsics, scale_factor);
 
 %% 
 points_3D_array = get_points_3D_array(matches, intrinsics, relative_pose_cell);
 
 waitbar(4/5,app.mywaitbar,'Clustering');
 %%
-[app.origin, app.sideLengths, app.floor_walls] = create_model_from_points(points3D_all);
+[app.origin, app.sideLengths, app.floor_walls] = create_model_from_points(points_3D_array);
 waitbar(5/5);
 
 app.DrawmodelButton.Visible = "on";
