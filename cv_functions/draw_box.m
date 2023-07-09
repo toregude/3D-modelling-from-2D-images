@@ -12,15 +12,17 @@ function draw_box(origin, sideLengths)
     
     % Define the vertices of the box
     vertices = [
-        x, y, z;                        % Vertex 1
-        x + sideLengthX, y, z;          % Vertex 2
-        x + sideLengthX, y + sideLengthY, z;  % Vertex 3
-        x, y + sideLengthY, z;          % Vertex 4
-        x, y, z + sideLengthZ;          % Vertex 5
-        x + sideLengthX, y, z + sideLengthZ;  % Vertex 6
-        x + sideLengthX, y + sideLengthY, z + sideLengthZ;  % Vertex 7
-        x, y + sideLengthY, z + sideLengthZ   % Vertex 8
+        x - sideLengthX/2, y - sideLengthY/2, z - sideLengthZ/2;                        % Vertex 1
+        x + sideLengthX/2, y - sideLengthY/2, z - sideLengthZ/2;          % Vertex 2
+        x + sideLengthX/2, y + sideLengthY/2, z - sideLengthZ/2;  % Vertex 3
+        x - sideLengthX/2, y + sideLengthY/2, z - sideLengthZ/2;          % Vertex 4
+        x - sideLengthX/2, y - sideLengthY/2, z + sideLengthZ/2;          % Vertex 5
+        x + sideLengthX/2, y - sideLengthY/2, z + sideLengthZ/2;  % Vertex 6
+        x + sideLengthX/2, y + sideLengthY/2, z + sideLengthZ/2;  % Vertex 7
+        x - sideLengthX/2, y + sideLengthY/2, z + sideLengthZ/2  % Vertex 8
     ];
+
+        
 
     % Define the faces of the box
     faces = [
