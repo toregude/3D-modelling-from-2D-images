@@ -12,7 +12,6 @@ while ~app.waitforGUI
 end
 app.mywaitbar = waitbar(0,'Please wait...');
 
-
 %%
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
@@ -37,7 +36,7 @@ matches = find_match_graph(features, valid_points, imageFiles);
 %%
 scale_factor = find_scale_factor(app.imagestxt);
 waitbar(3/5,app.mywaitbar, 'Creating 3D points');
-    %%
+%%
 
 num_imageFiles = size(imageFiles,1);
 [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K,scale_factor);
