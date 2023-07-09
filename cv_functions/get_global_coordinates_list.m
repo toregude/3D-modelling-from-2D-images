@@ -1,4 +1,6 @@
-function [senterliste, lengdeliste] = get_global_coordinates_list(points3D)
+
+
+function [senterliste, lengdeliste] =  get_global_coordinates_list(data)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
     
@@ -8,7 +10,7 @@ function [senterliste, lengdeliste] = get_global_coordinates_list(points3D)
     %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
     
     % Create a sample point cloud data in a list format
-    data = points3D;
+
     
     floor_level = find_floor_level(data)
     % [
@@ -48,7 +50,7 @@ function [senterliste, lengdeliste] = get_global_coordinates_list(points3D)
         senterliste(i, :) = O;
         lengdeliste(i ,:) = lengder;
     end
-    
+
     figure
     hold on;
     for i = 1:numObjects
