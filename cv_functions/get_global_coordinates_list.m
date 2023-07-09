@@ -2,6 +2,9 @@ function [senterliste, lengdeliste] =  create_model_from_points(data)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
     
+    ytemp = data(:, 3);
+    ztemp = data(:,2);
+    data(:, 2:3) = [ytemp, ztemp];
     
     
     % Må kjøre toreTry3Dcordinates.m først
@@ -21,7 +24,7 @@ function [senterliste, lengdeliste] =  create_model_from_points(data)
     roof_level = find_roof_level(data);
     
     
-    [idx, corepoints] = dbscan(data, 0.2, 40);
+    [idx, corepoints] = dbscan(data, 0.15, 10);
     numObjects = length(unique(idx)) - 1;
     
     max_room = max(data(idx ~= -1, 1:2))
@@ -51,9 +54,9 @@ function [senterliste, lengdeliste] =  create_model_from_points(data)
 
     figure
     hold on;
-    for i = 1:numObjects
-        draw_box(senterliste(i,:), lengdeliste(i,:));
-    end
+    % % for i = 1:numObjects
+    % %     draw_box(senterliste(i,:), lengdeliste(i,:));
+    % % end
     
 
     % % roof_level = find_roof_level(data);

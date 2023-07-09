@@ -2,7 +2,7 @@ function [points_3D_array] = get_points_3D_array(matches, intrinsics, relative_p
 
     points_3D_array = [];
     [m, n] = size(matches);
-
+    
     for i = 1:(m-1)
         points_3D_frame_i = [];
 
@@ -24,7 +24,9 @@ function [points_3D_array] = get_points_3D_array(matches, intrinsics, relative_p
             
             points_3D_frame_i = [points_3D_frame_i; points_3D];
         end
-        
-        points_3D_array = transformPointsForward(relative_pose_cell{i,i+1}, [points_3D_array; points_3D_frame_i]);
+
+        if ~isempty([points_3D_array; points_3D_frame_i])
+            points_3D_array = transformPointsForward(relative_pose_cell{i,j}, [points_3D_array; points_3D_frame_i]);
+        end
     end
 end
