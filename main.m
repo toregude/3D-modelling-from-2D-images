@@ -11,11 +11,14 @@ while ~app.waitforGUI
     pause(0.1);
 end
 app.mywaitbar = waitbar(0,'Please wait...');
+
+
+%%
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
 
-%Calibration matrix for the kicker
-intrinsics = intrinsics_from_cameraparams(camerastxt, imageFiles);
+%Calibration matrix
+intrinsics = intrinsics_from_cameraparams(app.camerastxt, imageFiles);
 
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
@@ -29,7 +32,7 @@ waitbar(1/7,app.mywaitbar,'Finding features');
 [features, valid_points] = find_features(imageFiles,intrinsics);
 waitbar(2/7,app.mywaitbar,'Matching features');
 %% 
-[G, matches] = find_match_graph(features, valid_points, imageFiles);
+matches = find_match_graph(features, valid_points, imageFiles);
 
 %%
 scale_factor = find_scale_factor(app.imagestxt);
