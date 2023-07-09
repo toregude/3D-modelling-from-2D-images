@@ -10,38 +10,43 @@ app = GUI;
 while ~app.waitforGUI
     pause(0.1);
 end
+app.mywaitbar = waitbar(0,'Please wait...');
 
+%%
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
 
-%Calibration matrix for the kicker
-K = K_from_cameraparams(app.camerastxt);
+%Calibration matrix
+intrinsics = intrinsics_from_cameraparams(app.camerastxt, imageFiles);
 
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
 % [cam_pos_sorted,sort_index] = sortrows(app.imagestxt);
 % imageFiles = imageFiles(sort_index);
 
-imageSize = size(im2gray(imread(imageFiles{1})));
-focalLength = [K(1,1) K(2,2)];
-principalPoint = [K(1,3) K(2,3)];
-intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
+
+waitbar(1/7,app.mywaitbar,'Finding features');
 
 %% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
 [features, valid_points] = find_features(imageFiles,intrinsics);
+waitbar(2/7,app.mywaitbar,'Matching features');
 %% 
-[G, matches] = find_match_graph(features, valid_points, imageFiles);
-% sequence = dfsearch(G,1)';
+matches = find_match_graph(features, valid_points, imageFiles);
 
 %%
-scale_factor = find_scale_factor(app.imagestxt);
+scale_factor = find_scale_factor(app.imagestxt, matches);
+waitbar(3/5,app.mywaitbar, 'Creating 3D points');
 
 %%
 relative_pose_cell = get_relative_pose_cell(matches, intrinsics, scale_factor);
 
 %% 
 points_3D_array = get_points_3D_array(matches, intrinsics, relative_pose_cell);
+
+waitbar(4/5,app.mywaitbar,'Clustering');
 %%
-%TODO: Z AND Y AXIS????
-[app.origin, app.sideLengths] = get_global_coordinates_list(points_3D_all_array);
+[app.origin, app.sideLengths, app.floor_walls] = create_model_from_points(points3D_all);
+waitbar(5/5);
+
 app.DrawmodelButton.Visible = "on";
+close(app.mywaitbar);
