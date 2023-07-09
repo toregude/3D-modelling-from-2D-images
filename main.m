@@ -4,10 +4,12 @@ addpath('cv_functions');
 % Open the GUI
 app = GUI;
 
+
+
 % Wait for the button click event
-uiwait(app.UIFigure);
-% Pause GUI
-app.waitforprogram = false;
+while ~app.waitforGUI
+    pause(0.1);
+end
 
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
@@ -43,6 +45,6 @@ num_imageFiles = size(imageFiles,1);
 %% 
 points3D_all = get_all_3D_points(points3D_all, num_imageFiles, matches, sequence, relPose_cell, intrinsics);
 %%
-%return to GUI
-app.waitforprogram = true;
-%get_global_coordinates_list(points3D_all);
+%TODO: Z AND Y AXIS????
+[app.origin, app.sideLengths] = get_global_coordinates_list(points3D_all);
+app.DrawmodelButton.Visible = "on";

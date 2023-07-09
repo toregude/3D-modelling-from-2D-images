@@ -1,4 +1,4 @@
-function get_global_coordinates_list(data)
+function [senterliste, lengdeliste] =  get_global_coordinates_list(data)
     
     % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
     
@@ -47,7 +47,7 @@ function get_global_coordinates_list(data)
         senterliste(i, :) = O;
         lengdeliste(i ,:) = lengder;
     end
-    
+
     figure
     hold on;
     for i = 1:numObjects
