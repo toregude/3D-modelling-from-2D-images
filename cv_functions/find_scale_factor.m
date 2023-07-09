@@ -1,4 +1,6 @@
-function scale_factor = find_scale_factor(allData)
+function scale_factor = find_scale_factor(allData, matches)
+
+    
     try
         campos_seq = allData(:, 2:4);
         scale_factor = zeros(size(allData,1)-1,1);

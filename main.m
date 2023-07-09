@@ -35,7 +35,7 @@ waitbar(2/7,app.mywaitbar,'Matching features');
 matches = find_match_graph(features, valid_points, imageFiles);
 
 %%
-scale_factor = find_scale_factor(app.imagestxt);
+scale_factor = find_scale_factor(app.imagestxt, matches);
 waitbar(3/5,app.mywaitbar, 'Creating 3D points');
     %%
 
