@@ -5,7 +5,7 @@ addpath('cv_functions');
 app = GUI;
 
 
-
+%%
 % Wait for the button click event
 while ~app.waitforGUI
     pause(0.1);
@@ -14,16 +14,13 @@ end
 % Preallocate an array to store the image file names
 imageFiles = app.imageDataArray;
 
-
 %Calibration matrix for the kicker
 K = K_from_cameraparams(app.camerastxt);
 
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
-allData = app.imagestxt;
-cam_pos_unsorted = allData(:, 1:4);
-[cam_pos_sorted,sort_index] = sortrows(cam_pos_unsorted);
-imageFiles = imageFiles(sort_index);
+% [cam_pos_sorted,sort_index] = sortrows(app.imagestxt);
+% imageFiles = imageFiles(sort_index);
 
 imageSize = size(im2gray(imread(imageFiles{1})));
 focalLength = [K(1,1) K(2,2)];
@@ -34,11 +31,12 @@ intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 [features, valid_points] = find_features(imageFiles,intrinsics);
 %% 
 [G, matches] = find_match_graph(features, valid_points, imageFiles);
-sequence = dfsearch(G,1)';
+% sequence = dfsearch(G,1)';
 
 %%
-scale_factor = find_scale_factor(cam_pos_sorted, sequence);
-%%
+scale_factor = find_scale_factor(app.imagestxt);
+
+    %%
 num_imageFiles = size(imageFiles,1);
 [relPose_cell, points3D_all] = get_relPosecell_and_3D_points(matches, sequence, intrinsics,num_imageFiles,K,scale_factor);
 
