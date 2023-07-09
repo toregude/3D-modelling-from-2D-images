@@ -37,10 +37,10 @@ intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
 scale_factor = find_scale_factor(app.imagestxt);
 
 %%
-relative_pose_cell = get_relative_pose_cell(matches, intrinsics, scale_factor);
+[relative_pose_cell, points_3D_array] = get_relative_pose_and_points_3D(matches, intrinsics, scale_factor);
 
 %% 
-points_3D_array = get_points_3D_array(matches, intrinsics, relative_pose_cell);
+points_3D_array = get_points_3D_array(matches, intrinsics, relative_pose_cell)
 %%
 %TODO: Z AND Y AXIS????
 [app.origin, app.sideLengths] = get_global_coordinates_list(points_3D_all_array);
