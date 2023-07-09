@@ -1,29 +1,20 @@
-function [senterliste, lengdeliste] =  create_model_from_points(data)
+function [origin, sideLengths] =  peders_test(data)
+    %we take in a dataset in a xzy-coordinate system. Must therefore change
+    %the columns 2 and 3 to get a xyz-coordinate system
+    ytemp = data(:,3);
+    ztemp = data(:,2);
+    data(:,2:3) = [ytemp, ztemp];
     
-    % path = '.\delivery_area_dslr_undistorted (ONLY FOR DEBUGGING)\delivery_area\dslr_calibration_undistorted\points3D.txt';
-    
-    
-    
-    % Må kjøre toreTry3Dcordinates.m først
-    %scatter3(global_coordinates(1,:),global_coordinates(2,:), global_coordinates(3,:))
-    
-    % Create a sample point cloud data in a list format
-
-    
-    floor_level = find_floor_level(data)
-    % [
-    %     1.2, 3.4, 2.1;
-    %     2.3, 1.5, 4.2;
-    %     5.6, 2.4, 3.1;
-    %     2.0, 4.7, 1.8;
-    %     % Add more points as needed
-    % ];
+    floor_level = find_floor_level(data);
     roof_level = find_roof_level(data);
     
-    
+    % Må legge inn en formel som avgjør parameter 2 og 3 i dbscan.
+    %Creating pointcloud
     [idx, corepoints] = dbscan(data, 0.2, 40);
     numObjects = length(unique(idx)) - 1;
     
+    %Find highest and smallest x and y coordinates for the points that are
+    %not outliers to sketch a floor and walls
     max_room = max(data(idx ~= -1, 1:2))
     min_room = min(data(idx ~= -1, 1:2))
     
@@ -37,26 +28,26 @@ function [senterliste, lengdeliste] =  create_model_from_points(data)
         min_list(i, :) = min(points_i);
     end
     
-    senterliste = zeros(numObjects, 3);
-    lengdeliste = zeros(numObjects, 3);
+    origin = zeros(numObjects, 3);
+    sideLengths = zeros(numObjects, 3);
     for i = 1:numObjects
         O = (min_list(i, :) + max_list(i, :))/2;
         lenX = max_list(i, 1) - min_list(i, 1);
         lenY = max_list(i, 2) - min_list(i, 2);
         lenZ = max_list(i, 3) - min_list(i, 3);
         lengder = [lenX, lenY, lenZ];
-        senterliste(i, :) = O;
-        lengdeliste(i ,:) = lengder;
+        origin(i, :) = O;
+        sideLengths(i ,:) = lengder;
     end
 
     figure
     hold on;
     for i = 1:numObjects
-        draw_box(senterliste(i,:), lengdeliste(i,:));
+        draw_box(origin(i,:), sideLengths(i,:));
     end
     
 
-    % % roof_level = find_roof_level(data);
+
     % % 
     % % 
     % % X = [min_room(1), min_room(1), max_room(1), max_room(1)];
