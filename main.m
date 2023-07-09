@@ -4,14 +4,13 @@ addpath('cv_functions');
 % Open the GUI
 app = GUI;
 
-
 %%
 % Wait for the button click event
 while ~app.waitforGUI
     pause(0.1);
 end
 app.mywaitbar = waitbar(0,'Please wait...');
-
+figure(app.mywaitbar);
 %%
 % Preallocate an array to store the image file names
 image_files = app.imageDataArray;
@@ -44,4 +43,6 @@ waitbar(4/5,app.mywaitbar,'Clustering');
 waitbar(5/5);
 
 app.DrawmodelButton.Visible = "on";
+
+%figure(app.UIFigure);
 close(app.mywaitbar);
