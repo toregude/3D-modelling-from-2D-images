@@ -1,8 +1,6 @@
-function [data] = get_global_R_and_T()
+function [data] = get_global_R_and_T(file_path)
 
-    % Specify the path to your .txt file
-    file_path = '.\kicker_dslr_undistorted\kicker\dslr_calibration_undistorted\images.txt';
-    
+
     % Open the file
     fid = fopen(file_path, 'r');
     
