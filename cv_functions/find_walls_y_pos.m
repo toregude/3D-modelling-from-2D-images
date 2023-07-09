@@ -1,8 +1,8 @@
 function valid_wall_list = find_walls_y_pos(global_coords)
     data = global_coords;
-    min_y = -30.;
-    max_y = 30.;
-    delta_y = 0.1;
+    min_y = -50.;
+    max_y = 50.;
+    delta_y = 0.05;
     y = min_y:delta_y:max_y;
     last_count = 0;
     y_level = min_y;
@@ -11,15 +11,15 @@ function valid_wall_list = find_walls_y_pos(global_coords)
     x_max = 0;
     x_min_last = 0;
     x_max_last = 0;
-    for i = 1:length(y)-3
+    for i = 1:length(y)-20
         count = length(data(data(:, 2) < y(i+1))) - length(data(data(:, 2) <= y(i)));
-        if count < 10
+        if count < 20
             last_count = count;
             continue;
         else
-            if count/last_count > 5
-                y_level = y(i);
-                mulige_coords = global_coords(global_coords(:,2)>=y(i) & global_coords(:,2)<y(i+3), :)
+            if (count/last_count > 5) || (count > 100) 
+                y_level = y(i-20);
+                mulige_coords = global_coords(global_coords(:,2)>=y(i) & global_coords(:,2)<y(i+20), :)
                 x_coords = mulige_coords(:, 1);
                 x_coords = sort(x_coords, "ascend")
                 x_max = x_coords(end);

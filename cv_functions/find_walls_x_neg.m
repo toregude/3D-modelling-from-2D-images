@@ -1,8 +1,8 @@
 function valid_wall_list = find_walls_x_neg(global_coords)
     data = global_coords;
-    min_x = -30.;
-    max_x = 30.;
-    delta_x = 0.1;
+    min_x = -50.;
+    max_x = 50.;
+    delta_x = 0.05;
     x = min_x:delta_x:max_x;
     x = sort(x,'descend');
     disp(x);
@@ -13,15 +13,15 @@ function valid_wall_list = find_walls_x_neg(global_coords)
     y_max = 0;
     y_min_last = 0;
     y_max_last = 0;
-    for i = 1:length(x)-3
+    for i = 1:length(x)-20
         count = length(data(data(:, 1) > x(i+1))) - length(data(data(:, 1) >= x(i)));
-        if count < 10
+        if count < 20
             last_count = count;
             continue;
         else
-            if count/last_count > 5
-                x_level = x(i);
-                mulige_coords = global_coords(global_coords(:,1)<=x(i) & global_coords(:,1)>x(i+3), :)
+            if (count/last_count > 5) || (count > 100) 
+                x_level = x(i-20);
+                mulige_coords = global_coords(global_coords(:,1)<=x(i) & global_coords(:,1)>x(i+20), :)
                 y_coords = mulige_coords(:, 2);
                 y_coords = sort(y_coords, "ascend");
                 disp(y_coords)
