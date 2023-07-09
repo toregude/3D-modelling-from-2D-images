@@ -1,15 +1,15 @@
-function [relative_pose_cell, matches] = get_relative_pose_cell(matches, intrinsics, scale_factor)
+function [relative_pose_cell] = get_relative_pose_cell(matches, intrinsics, scale_factor)
     
     [m, n] = size(matches);
     relative_pose_cell = cell(m,n);
 
-    for i = 1:m
+    for i = 1:m-1
         for j = i+1:n
             matched_points1 = matches{i, j};
             matched_points2 = matches{j, i};
         
             %If there are too few matched points, then the essential matrix can not be found.
-            if or(size(matched_points1,1)<=10,size(matched_points2,1)<=10)
+            if or(size(matched_points1,1)<=5,size(matched_points2,1)<=5)
                 relative_pose_cell{i,j} = rigidtform3d; %When disruption, assign R=I, T=0.
                 continue
             end
@@ -23,8 +23,6 @@ function [relative_pose_cell, matches] = get_relative_pose_cell(matches, intrins
                 relative_pose = estrelpose(E, intrinsics, inlier_points1, inlier_points2);
             catch
                 relative_pose_cell{i,j} = rigidtform3d; %When disruption, assign R=I, T=0.
-                matches{i,j} = [];
-                matches{j,i} = [];
                 continue
             end
             warning('on');
@@ -35,7 +33,7 @@ function [relative_pose_cell, matches] = get_relative_pose_cell(matches, intrins
             end
             
             %Changing the scale of the translation part of the relative pose
-            relative_pose.A(1:3,4) = (relative_pose.A(1:3,4))*scale_factor(i,j);       
+            % relative_pose.T = (relative_pose.T)*scale_factor(i,j);       
             relative_pose_cell{i,j} = relative_pose;
         end
     end

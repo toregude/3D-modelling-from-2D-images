@@ -11,7 +11,7 @@ function [origin, sideLengths, floor_walls] =  create_model_from_points(data)
     floor_level = 0;
     % Må legge inn en formel som avgjør parameter 2 og 3 i dbscan.
     %Creating pointcloud
-    [idx, corepoints] = dbscan(data, 0.2, 40);
+    [idx, corepoints] = dbscan(data, 0.10, 15);
     numObjects = length(unique(idx)) - 1;
     
     %Find highest and smallest x and y coordinates for the points that are
