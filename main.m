@@ -15,18 +15,16 @@ app.mywaitbar = waitbar(0,'Please wait...');
 imageFiles = app.imageDataArray;
 
 %Calibration matrix for the kicker
-K = K_from_cameraparams(app.camerastxt);
+intrinsics = intrinsics_from_cameraparams(camerastxt, imageFiles);
 
 %%Denen koden skal i utgangspunktet ikke trenges, men trengs på et eller
 %%annet sykt vis, ikke rør
 % [cam_pos_sorted,sort_index] = sortrows(app.imagestxt);
 % imageFiles = imageFiles(sort_index);
 
-imageSize = size(im2gray(imread(imageFiles{1})));
-focalLength = [K(1,1) K(2,2)];
-principalPoint = [K(1,3) K(2,3)];
-intrinsics = cameraIntrinsics(focalLength,principalPoint,imageSize);
+
 waitbar(1/7,app.mywaitbar,'Finding features');
+
 %% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
 [features, valid_points] = find_features(imageFiles,intrinsics);
 waitbar(2/7,app.mywaitbar,'Matching features');
