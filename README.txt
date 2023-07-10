@@ -2,6 +2,10 @@ Ting å endre fra single mappe til universal mappe
 
 Endre fra -2 til -1 i getRelPose
 
+Readme: Erstellen Sie eine Readme.txt Datei, die eine Anleitung Ihrer Applikation und eine Liste aller fur die Ausfuhrung der Applikation notwendigen Toolbo- ¨
+xen beinhaltet.
+
+
 References:
 Extract Harris Features
 -detectHarrisFeatures
