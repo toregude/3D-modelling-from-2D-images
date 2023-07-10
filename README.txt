@@ -1,25 +1,29 @@
-Ting å endre fra single mappe til universal mappe
+Usage:
+The program is started by running the main.m file. Then a dialog box opens, with two buttons, "Cancel" and "Browse folder". By pressing "Cancel", the program is exited, and by pressing "Browse folder" the user is able to select the folder containing the appropriate image and .txt files for the 3D model generation. The selected folder needs to contain two additional folders, one named "images" containing, and one named "parameters"
 
-Endre fra -2 til -1 i getRelPose
-
-Readme: Erstellen Sie eine Readme.txt Datei, die eine Anleitung Ihrer Applikation und eine Liste aller fur die Ausfuhrung der Applikation notwendigen Toolbo- ¨
-xen beinhaltet.
-
-
-References:
 Extract Harris Features
--detectHarrisFeatures
--https://de.mathworks.com/help/vision/ref/detectharrisfeatures.html
+-function name: detectHarrisFeatures
+-tool box: Computer Vision Toolbox
+-documentation: https://de.mathworks.com/help/vision/ref/detectharrisfeatures.html
 
 Match Features
--matchFeatures
--https://de.mathworks.com/help/vision/ref/matchfeatures.html
+-function name: matchFeatures
+-tool box: Computer Vision Toolbox
+-documentation: https://de.mathworks.com/help/vision/ref/matchfeatures.html
 
 Estimating Essential matrix
--estimateEssentialMatrix
--https://de.mathworks.com/help/vision/ref/estimateessentialmatrix.html
+-function name: estimateEssentialMatrix
+-tool box: Computer Vision Toolbox
+-documentation: https://de.mathworks.com/help/vision/ref/estimateessentialmatrix.html
 
 Estimating R og T from E
+
+-function name: estrelpose
+-tool box: Computer Vision Toolbox
+-documentation: https://de.mathworks.com/help/vision/ref/estrelpose.html
+
+dbscan
+
 -estrelpose
 -https://de.mathworks.com/help/vision/ref/estrelpose.html
 
