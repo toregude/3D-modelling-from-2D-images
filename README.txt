@@ -18,3 +18,15 @@ Estimating Essential matrix
 Estimating R og T from E
 -estrelpose
 -https://de.mathworks.com/help/vision/ref/estrelpose.html
+
+3-D locations of undistorted matching points in stereo images
+-triangulate
+-https://se.mathworks.com/help/vision/ref/triangulate.html
+
+Returns a 3-by-4 camera projection matrix
+-cameraProjection
+-https://se.mathworks.com/help/vision/ref/cameraprojection.html?s_tid=doc_ta
+
+Apply forward geometric transformation
+-transformPointsForward
+-https://se.mathworks.com/help/images/ref/affinetform2d.transformpointsforward.html
