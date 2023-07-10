@@ -1,6 +1,7 @@
-%%
 addpath('cv_functions');
+addpath('GUI_functions')
 
+%%
 % Open the GUI
 app = GUI;
 
@@ -11,38 +12,50 @@ while ~app.waitforGUI
 end
 app.mywaitbar = waitbar(0,'Please wait...');
 figure(app.mywaitbar);
+
 %%
-% Preallocate an array to store the image file names
+% Preallocate an array to store the image file names, and then load the images
+waitbar(1/9, app.mywaitbar, 'Loading images');
 image_files = app.imageDataArray;
 
-%Calibration matrix
-intrinsics = intrinsics_from_cameraparams(app.camerastxt, image_files);
+%%
+% Get camera intrinsics from text file
+waitbar(2/9, app.mywaitbar, 'Loading camera intrinsics');
+camera_intrinsics = get_camera_intrinsics(app.camerastxt, image_files);
 
-waitbar(1/7,app.mywaitbar,'Finding features');
-
-%% Her er koden du trenger for å kjøre, alt over er bare lagt til for å få det til å kjøre
-[features, valid_points] = find_features(image_files,intrinsics);
-waitbar(2/7,app.mywaitbar,'Matching features');
+%%
+% Create two cells, one for the features of all images, another for the valid points of all images
+waitbar(3/9, app.mywaitbar, 'Finding features');
+[features_cell, valid_points_cell] = get_features_and_valid_points_cell(image_files, camera_intrinsics);
 
 %% 
-matches = find_match_graph(features, valid_points, image_files);
+% Create a matrix containing the matched features of all pictures
+waitbar(4/9,app.mywaitbar,'Matching features');
+matches_matrix = get_matches_matrix(features_cell, valid_points_cell, image_files);
 
 %%
-scale_factor = find_scale_factor(app.imagestxt, matches);
-waitbar(3/5,app.mywaitbar, 'Creating 3D points');
+% Utilize the absolute camera positions to calculate the scale factors of the relative translations
+waitbar(5/9,app.mywaitbar,'Calculating scale factors');
+scaling_factor_matrix = get_scaling_factor_matrix(app.imagestxt, matches_matrix);
 
 %%
-[relative_pose_cell] = get_relative_pose_cell(matches, intrinsics, scale_factor);
+% Calculate the relative poses between all pictures, from one frame to the next one in the image sequence
+waitbar(6/9,app.mywaitbar,'Calculating relative poses');
+[relative_pose_cell] = get_relative_pose_cell(matches_matrix, camera_intrinsics, scaling_factor_matrix);
 
 %% 
-points_3D_array = get_points_3D_array(matches, intrinsics, relative_pose_cell);
-waitbar(4/5,app.mywaitbar,'Clustering');
+% Triangulate 3D points using the matched points and relative poses between images
+waitbar(7/9,app.mywaitbar, 'Triangulating 3D points');
+points_3D_array = get_points_3D_array(matches_matrix, camera_intrinsics, relative_pose_cell);
 
 %%
-[app.origin, app.sideLengths, app.floor_walls] = create_model_from_points(points_3D_array);
-waitbar(5/5);
+% Create the actual 3D model
+waitbar(8/9,app.mywaitbar,'Creating 3D model');
+[app.origin, app.sideLengths, app.floor_walls] = create_3D_model(points_3D_array);
 
+%%
+waitbar(9/9);
 app.DrawmodelButton.Visible = "on";
 
-%figure(app.UIFigure);
+figure(app.UIFigure);
 close(app.mywaitbar);
