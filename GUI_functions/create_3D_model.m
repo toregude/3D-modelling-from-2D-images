@@ -5,43 +5,44 @@ function [origin, sideLengths, floor_walls] =  create_3D_model(points_3D_array)
     z_temp = points_3D_array(:,2);
     points_3D_array(:,2:3) = [y_temp, z_temp];
     
+    %Find the height of the room by checking where the first clusters are located in z-direction
     floor_level = find_floor_level(points_3D_array);
     roof_level = find_roof_level(points_3D_array) - floor_level;
     points_3D_array(:,3) = points_3D_array(:,3) - floor_level;
     floor_level = 0;
 
-    %Creating pointcloud
-    [idx, corepoints] = dbscan(points_3D_array, 0.10, 15);
-    numObjects = length(unique(idx)) - 1;
+    %Clustering by dbscan-method
+    [idx, ~] = dbscan(points_3D_array, 0.10, 15);
+    num_objects = length(unique(idx)) - 1;
     
     %Find highest and smallest x and y coordinates for the points that are
     %not outliers to sketch a floor and walls
     max_room = max(points_3D_array(idx ~= -1, 1:2));
     min_room = min(points_3D_array(idx ~= -1, 1:2));
     
-    
-    
-    min_list = zeros(3,numObjects)';
-    max_list = zeros(3,numObjects)';
-    for i = 1:numObjects
+    %Creating two lists where the minimum and maximum values of the clusters are to be located.
+    min_list = zeros(3,num_objects)';
+    max_list = zeros(3,num_objects)';
+    for i = 1:num_objects
         points_i = points_3D_array(idx==i, :);
         max_list(i, :) = max(points_i);
         min_list(i, :) = min(points_i);
     end
     
-    origin = zeros(numObjects, 3);
-    sideLengths = zeros(numObjects, 3);
-    for i = 1:numObjects
+    %Finding origin and sideLength of each cluster based on minimum and maximum x and y values.
+    origin = zeros(num_objects, 3);
+    sideLengths = zeros(num_objects, 3);
+    for i = 1:num_objects
         O = (min_list(i, :) + max_list(i, :))/2;
-        lenX = max_list(i, 1) - min_list(i, 1);
-        lenY = max_list(i, 2) - min_list(i, 2);
-        lenZ = max_list(i, 3) - min_list(i, 3);
-        lengder = [lenX, lenY, lenZ];
+        len_X = max_list(i, 1) - min_list(i, 1);
+        len_Y = max_list(i, 2) - min_list(i, 2);
+        len_Z = max_list(i, 3) - min_list(i, 3);
+        lengths = [len_X, len_Y, len_Z];
         origin(i, :) = O;
-        sideLengths(i ,:) = lengder;
+        sideLengths(i ,:) = lengths;
     end
     
-    %creating floor and walls
+    %Creating floor and walls
     floor_walls = cell(1,5);
     X_floor = [min_room(1), min_room(1), max_room(1), max_room(1)];
     Y_floor = [min_room(2), max_room(2), max_room(2), min_room(2)];
