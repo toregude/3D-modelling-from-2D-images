@@ -3,6 +3,8 @@ The program is started by running the main.m file. Then a dialog box opens, with
 
 When the model of the room is finished a button with Draw Model show. Click on the button and a 3D model of the room is shown, allowing the user to click on two points in the room and the distance between them displays.
 
+The test set "office" is part of the ETH3D datasets, which may be found here: https://www.eth3d.net/datasets.
+
 Needed official Matlab toolboxes:
 Statistics and Machine Learning Toolbox
 Image Processing Toolbox
