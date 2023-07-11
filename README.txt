@@ -1,5 +1,14 @@
 Usage:
-The program is started by running the main.m file. Then a dialog box opens, with two buttons, "Cancel" and "Browse folder". By pressing "Cancel", the program is exited, and by pressing "Browse folder" the user is able to select the folder containing the appropriate image and .txt files for the 3D model generation. The selected folder needs to contain two additional folders, one named "images" containing, and one named "parameters"
+The program is started by running the main.m file. Then a dialog box opens, with two buttons, "Cancel" and "Browse folder". By pressing "Cancel", the program is exited, and by pressing "Browse folder" the user is able to select the folder containing the appropriate image and .txt files for the 3D model generation. The selected folder needs to contain two additional folders, one named "images" containing the images, and one named "parameters", contating a camera.txt file and images.txt file. The camera.txt file needs to contain the camera parameters in this order
+CAMERA_ID, MODEL, WIDTH, HEIGHT, PARAMS[]
+for the calibration of the 2D images. When the images.txt file containts information about the camera position in this order
+ID X Y Z (camera pos) Camera Imagename
+the scaling ambigity in estimating the pose between images are solved taking advantage of the camera positions. If the file is in another order or dosn't contain the right information, the program still execute, but without solving the scaling ambigity. 
+
+Needed official Matlab Toolboxes:
+
+
+Readme: Lag en Readme.txt-fil som inneholder en veiledning til applikasjonen din og en liste over alle verktøykassene som trengs for å kjøre applikasjonen.
 
 Extract Harris Features
 -function name: detectHarrisFeatures
