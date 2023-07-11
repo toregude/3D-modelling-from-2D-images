@@ -17,8 +17,8 @@ function matches_matrix = get_matches_matrix(features_cell, valid_points_cell, i
             matched_points1 = valid_points1.Location(index_pairs(:,1),:);
             matched_points2 = valid_points2.Location(index_pairs(:,2),:);
             
-            %At least five matched points are needed from each image to later compute E
-            if and(length(matched_points1)>5, length(matched_points2)>5)
+            %At least five matched points are needed from each image to later compute E, but it gives better results with 8
+            if and(length(matched_points1)>7, length(matched_points2)>7)
                 matches_matrix{i,j} = matched_points1;
                 matches_matrix{j,i} = matched_points2;
             end

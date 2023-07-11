@@ -9,13 +9,14 @@ function [relative_pose_cell] = get_relative_pose_cell(matches_matrix, camera_in
             matched_points2 = matches_matrix{j, i};
         
             %If there are too few matched points, then the essential matrix can not be found.
-            if or(size(matched_points1,1)<=5,size(matched_points2,1)<=5)
+            if or(size(matched_points1,1)<=7,size(matched_points2,1)<=7)
                 relative_pose_cell{i,j} = rigidtform3d; %When disruption, assign R=I, T=0.
                 continue
             end
     
             warning('off'); %This is needed due to the high confidence of the essential matrix estimation.
             try
+                %estimateEssentialMatrix utilizes MSAC, which is a variant of RANSAC, thus it is not deterministic, and might therefore return different results for the same input
                 [E, epipolar_inliers] = estimateEssentialMatrix(matched_points1, matched_points2, camera_intrinsics, 'Confidence', 99);
                 inlier_points1 = matched_points1(epipolar_inliers, :);
                 inlier_points2 = matched_points2(epipolar_inliers, :);

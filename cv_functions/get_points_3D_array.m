@@ -11,7 +11,7 @@ function [points_3D_array] = get_points_3D_array(matches_matrix, camera_intrinsi
             matched_points2 = matches_matrix{j, i};
         
             %If there are too few matched points, then the essential matrix can not be found.
-            if or(size(matched_points1,1)<=5,size(matched_points2,1)<=5)
+            if or(size(matched_points1,1)<=7,size(matched_points2,1)<=7)
                 continue
             end
 
