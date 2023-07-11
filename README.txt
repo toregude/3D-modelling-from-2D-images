@@ -6,7 +6,10 @@ ID X Y Z (camera pos) Camera Imagename
 the scaling ambigity in estimating the pose between images are solved taking advantage of the camera positions. If the file is in another order or dosn't contain the right information, the program still execute, but without solving the scaling ambigity. 
 
 Needed official Matlab Toolboxes:
-
+image_toolbox
+matlab
+statistics_toolbox
+video_and_image_blockset
 
 Readme: Lag en Readme.txt-fil som inneholder en veiledning til applikasjonen din og en liste over alle verktøykassene som trengs for å kjøre applikasjonen.
 
