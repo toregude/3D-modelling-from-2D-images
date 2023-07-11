@@ -11,6 +11,8 @@ matlab
 statistics_toolbox
 video_and_image_blockset
 
+
+----------------ALT UNDER HER SLETTES--------------------
 Readme: Lag en Readme.txt-fil som inneholder en veiledning til applikasjonen din og en liste over alle verktøykassene som trengs for å kjøre applikasjonen.
 
 Extract Harris Features
