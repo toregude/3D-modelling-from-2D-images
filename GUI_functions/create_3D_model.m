@@ -67,4 +67,4 @@ function [origin, sideLengths, floor_walls] =  create_3D_model(points_3D_array)
     Y_4 = [min_room(2), min_room(2), min_room(2), min_room(2)];
     Z_4 = [floor_level, floor_level, roof_level, roof_level];
     floor_walls{5} = [X_4; Y_4; Z_4];
-
+end
