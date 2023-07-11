@@ -3,7 +3,9 @@ The program is started by running the main.m file. Then a dialog box opens, with
 CAMERA_ID, MODEL, WIDTH, HEIGHT, PARAMS[]
 for the calibration of the 2D images. When the images.txt file containts information about the camera position in this order
 ID X Y Z (camera pos) Camera Imagename
-the scaling ambigity in estimating the pose between images are solved taking advantage of the camera positions. If the file is in another order or dosn't contain the right information, the program still execute, but without solving the scaling ambigity. 
+the scaling ambigity in estimating the pose between images are solved taking advantage of the camera positions. If the file is in another order or dosn't contain the right information, the program still execute, but without solving the scaling ambuigity. 
+
+When the model of the room is finished a button with Draw Model show. Click on the button and a 3D model of the room is shown, allowing the user to click on two points in the room and the distance between them displays.
 
 Needed official Matlab Toolboxes:
 image_toolbox
